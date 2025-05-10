@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendar - Select Year & Month</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light py-4">
+
+<div class="container">
+  <h1 class="mb-4 text-center">Calendar - Select Year & Month</h1>
+
+  <!-- Calendar -->
+  <div id="calendar" class="row justify-content-center"></div>
+</div>
+
+<script>
+  const calendarContainer = document.getElementById('calendar');
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const attendance = {
+    "2025-05-01": "present",
+    "2025-05-02": "absent",
+    "2025-05-05": "present",
+    "2025-05-06": "absent",
+    "2025-05-10": "present"
+  };
+
+  let currentYear, currentMonth;
+
+  function renderMonth(year, month) {
+    calendarContainer.innerHTML = "";
+
+    const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+
+    const colDiv = document.createElement("div");
+    colDiv.className = "col-md-10";
+
+    const card = document.createElement("div");
+    card.className = "card shadow";
+
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body";
+
+    // Navigation
+    const navRow = document.createElement("div");
+    navRow.className = "d-flex justify-content-between align-items-center mb-3";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn btn-outline-secondary btn-sm";
+    prevBtn.textContent = "←";
+    prevBtn.onclick = () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderMonth(currentYear, currentMonth);
+    };
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-outline-secondary btn-sm";
+    nextBtn.textContent = "→";
+    nextBtn.onclick = () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderMonth(currentYear, currentMonth);
+    };
+
+    const title = document.createElement("h5");
+    title.className = "mb-0 text-center flex-grow-1";
+    title.textContent = `${monthName} ${year}`;
+
+    navRow.appendChild(prevBtn);
+    navRow.appendChild(title);
+    navRow.appendChild(nextBtn);
+
+    cardBody.appendChild(navRow);
+
+    // Day Headers
+    const headerRow = document.createElement("div");
+    headerRow.className = "row text-center fw-bold";
+    dayNames.forEach(day => {
+      const col = document.createElement("div");
+      col.className = "col border py-2";
+      col.textContent = day;
+      headerRow.appendChild(col);
+    });
+    cardBody.appendChild(headerRow);
+
+    // Dates
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let date = 1;
+    for (let row = 0; row < 6 && date <= daysInMonth; row++) {
+      const weekRow = document.createElement("div");
+      weekRow.className = "row text-center";
+
+      for (let col = 0; col < 7; col++) {
+        const dayCol = document.createElement("div");
+        dayCol.className = "col border d-flex align-items-center justify-content-center";
+        dayCol.style.height = "80px";
+
+        if ((row === 0 && col < firstDay) || date > daysInMonth) {
+          dayCol.innerHTML = "&nbsp;";
+        } else {
+          const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+          const dayText = document.createElement("div");
+          dayText.innerHTML = `<strong>${date}</strong>`;
+
+          if (attendance[currentDate] === "present") {
+            dayCol.classList.add("bg-success", "text-white");
+          } else if (attendance[currentDate] === "absent") {
+            dayCol.classList.add("bg-danger", "text-white");
+          }
+
+          dayCol.appendChild(dayText);
+          date++;
+        }
+
+        weekRow.appendChild(dayCol);
+      }
+      cardBody.appendChild(weekRow);
+    }
+
+    card.appendChild(cardBody);
+    colDiv.appendChild(card);
+    calendarContainer.appendChild(colDiv);
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth();
+    renderMonth(currentYear, currentMonth);
+  });
+</script>
+
+</body>
+</html>
