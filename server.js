@@ -1,10 +1,12 @@
 const app = require("./app");
-// const { connectDb } = require("./config/db");
+const { connectDb } = require("./config/db");
 require('dotenv').config();
+
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, async () => {
     try {
-        // await connectDb();
+        await connectDb();
         console.log(`Ecommerce API listening on PORT ${PORT}`);
     } catch (error) {
         console.error("Database connection failed:", error);

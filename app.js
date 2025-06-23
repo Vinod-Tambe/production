@@ -1,8 +1,16 @@
-const express = require('express');
-const app = express();
-app.use(express.json());
-app.get('/', (req, res) => {
-  res.send('API is working!');
-});
+const express=require("express");
+const cors=require("cors");
+const path=require('path')
+const app=express();
+app.use(express.json())
+app.use(cors());
 
-module.exports = app;
+app.use(express.static(path.join(__dirname, 'public')));
+const htmlPath = path.join(__dirname, './views/index.html'); 
+app.get("/",(req,res)=>{
+    return res.sendFile(htmlPath);
+})
+
+const ownerRouters=require("./routes/owner.route.js")
+app.use("/owner",ownerRouters)
+module.exports=app;
