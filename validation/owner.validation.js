@@ -1,4 +1,3 @@
-// validation/owner.validation.js
 const Joi = require("joi");
 
 const ownerValidationSchema = Joi.object({
@@ -27,9 +26,21 @@ const ownerValidationSchema = Joi.object({
   own_address: Joi.string().max(255).required(),
 
   own_login_id: Joi.string().alphanum().min(4).max(50).required(),
-  own_password: Joi.string().min(6).max(100).required(),
 
-  own_payment_gateway: Joi.string().valid("PhonePe", "Razorpay", "Paytm", "Stripe").required(),
+  own_password: Joi.string().min(6).max(100).required()
+    .messages({ "string.min": "Password must be at least 6 characters long." }),
+
+  own_confirm_password: Joi.any()
+    .valid(Joi.ref("own_password"))
+    .required()
+    .label("Confirm password")
+    .messages({
+      "any.only": "Confirm password must match password.",
+    }),
+
+  own_payment_gateway: Joi.string()
+    .valid("PhonePe", "Razorpay", "Paytm", "Stripe")
+    .required(),
   own_merchant_id: Joi.string().max(100).required(),
   own_salt_key: Joi.string().max(100).required(),
   own_salt_index_key: Joi.string().max(10).required(),
