@@ -1,5 +1,5 @@
 const ownerService = require("../services/owner.service");
-const jwtProvider = require("../config/jwtProvider");
+const jwtProvider = require("../utils/jwtProvider");
 const { validateOwner } = require("../validation/owner.validation");
 
 // Create a new owner

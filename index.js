@@ -14,3 +14,11 @@ app.get("/",(req,res)=>{
 const ownerRouters=require("./routes/owner.route.js")
 app.use("/owner",ownerRouters)
 module.exports=app;
+
+const adminRouters=require("./routes/admin.route.js")
+app.use("/admin",adminRouters)
+module.exports=app;
+
+const authRouters=require("./routes/auth.route.js")
+app.use("/auth",authRouters)
+module.exports=app;
