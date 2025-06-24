@@ -12,7 +12,7 @@ const get_owner_id_by_token=(token)=>{
 }
 const get_admin_id_by_token=(token)=>{
     const decodedToken=jwt.verify(token,SECRET_KEY)
-    return decodedToken.adminId;
+    return decodedToken.userId.adminId;
 }
 
 module.exports={get_owner_id_by_token,get_admin_id_by_token,generateToken}

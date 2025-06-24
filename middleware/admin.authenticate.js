@@ -1,4 +1,4 @@
-const jwtProvider = require("../config/jwtProvider");
+const jwtProvider = require("../utils/jwtProvider");
 const adminService = require("../services/admin.service");
 
 const admin_authentication = async (req, res, next) => {
