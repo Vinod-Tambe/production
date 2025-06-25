@@ -1,7 +1,8 @@
+const mongoose = require("mongoose");
 const Owner = require("../models/owner.model");
 const bcrypt = require("bcrypt");
 
-// Create a new owner
+// ✅ Create a new owner
 const create_new_owner = async (owner_data) => {
   try {
     const isOwnerExist = await Owner.findOne({
@@ -32,7 +33,7 @@ const create_new_owner = async (owner_data) => {
       own_payment_gateway: owner_data.own_payment_gateway,
       own_merchant_id: owner_data.own_merchant_id,
       own_salt_key: owner_data.own_salt_key,
-      own_salt_index_key: owner_data.own_salt_index_key
+      own_salt_index_key: owner_data.own_salt_index_key,
     });
 
     return owner_details;
@@ -41,9 +42,13 @@ const create_new_owner = async (owner_data) => {
   }
 };
 
-// Update owner by ID
+// ✅ Update owner by ID
 const update_owner_by_id = async (owner_id, updated_data) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(owner_id)) {
+      throw new Error("Invalid owner ID format.");
+    }
+
     if (updated_data.own_password) {
       updated_data.own_password = await bcrypt.hash(updated_data.own_password, 8);
     }
@@ -51,7 +56,7 @@ const update_owner_by_id = async (owner_id, updated_data) => {
     const updated_owner = await Owner.findByIdAndUpdate(
       owner_id,
       updated_data,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updated_owner) {
@@ -64,9 +69,13 @@ const update_owner_by_id = async (owner_id, updated_data) => {
   }
 };
 
-// Delete owner by ID
+// ✅ Delete owner by ID
 const delete_owner_by_id = async (owner_id) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(owner_id)) {
+      throw new Error("Invalid owner ID format.");
+    }
+
     const deleted_owner = await Owner.findByIdAndDelete(owner_id);
 
     if (!deleted_owner) {
@@ -79,7 +88,7 @@ const delete_owner_by_id = async (owner_id) => {
   }
 };
 
-// Forgot password by mobile number or login ID
+// ✅ Forgot password by mobile number or login ID
 const forgot_password = async (identifier, new_password) => {
   try {
     const owner = await Owner.findOne({
@@ -103,23 +112,29 @@ const forgot_password = async (identifier, new_password) => {
   }
 };
 
-// ✅ Get owner details by ID
+// ✅ Get owner details by ID (updated and validated)
 const get_owner_details_by_id = async (owner_id) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(owner_id)) {
+      throw new Error("Invalid owner ID format.");
+    }
+
     const owner = await Owner.findById(owner_id);
+
     if (!owner) {
       throw new Error("Owner not found with ID: " + owner_id);
     }
+
     return owner;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error("Error fetching owner: " + error.message);
   }
 };
 
 // ✅ Get all owners
 const get_all_owners = async () => {
   try {
-    const owners = await Owner.find();
+    const owners = await Owner.find().sort({ createdAt: -1 });
     return owners;
   } catch (error) {
     throw new Error("Failed to fetch owners: " + error.message);

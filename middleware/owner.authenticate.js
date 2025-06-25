@@ -5,7 +5,7 @@ const owner_authentication = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // 1. Check if the Authorization header exists and is in correct format
+    // 1. Check for Bearer token format
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -18,12 +18,14 @@ const owner_authentication = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "Access token is missing from the Authorization header."
+        message: "Access token is missing."
       });
     }
 
-    // 3. Validate and decode token to get owner ID
-    const ownerId = await jwtProvider.get_owner_id_by_token(token);
+    // 3. Decode token and get owner ID
+    const payload = await jwtProvider.get_owner_id_by_token(token);
+    const ownerId = payload?.userId || payload?._id || payload;
+
     if (!ownerId) {
       return res.status(401).json({
         success: false,
@@ -31,24 +33,24 @@ const owner_authentication = async (req, res, next) => {
       });
     }
 
-    // 4. Fetch owner details
-    const result = await ownerService.get_owner_details({ _id: ownerId });
-    if (!result || !result.data) {
+    // 4. Fetch owner from DB
+    const owner = await ownerService.get_owner_details_by_id(ownerId);
+    if (!owner) {
       return res.status(404).json({
         success: false,
-        message: "Owner not found for the provided token."
+        message: "Owner not found."
       });
     }
 
-    // 5. Attach owner details to request object
-    req.user = result.data;
+    // 5. Attach owner to request and proceed
+    req.user = owner;
     next();
 
   } catch (error) {
-    console.error("Owner Authentication Error:", error);
+    console.error("Owner Authentication Error:", error.message);
     return res.status(500).json({
       success: false,
-      message: "Internal server error during owner authentication."
+      message: "Internal server error during authentication."
     });
   }
 };
