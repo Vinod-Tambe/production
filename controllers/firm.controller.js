@@ -1,13 +1,19 @@
-const Firm = require("../models/firm.model");
+const firmService = require("../services/firm.service");
 
 // Create new firm
 const create_firm = async (req, res) => {
   try {
-    const newFirm = new Firm(req.body);
-    const savedFirm = await newFirm.save();
-    res.status(201).json({ success: true, data: savedFirm });
+    const savedFirm = await firmService.create_firm(req.body);
+    res.status(201).json({
+      success: true,
+      message: "Firm created successfully",
+      data: savedFirm,
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: `Failed to create firm: ${error.message}`,
+    });
   }
 };
 
@@ -15,18 +21,25 @@ const create_firm = async (req, res) => {
 const update_firm = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedFirm = await Firm.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedFirm = await firmService.update_firm(id, req.body);
 
     if (!updatedFirm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Firm not found with the provided ID",
+      });
     }
 
-    res.json({ success: true, data: updatedFirm });
+    res.status(200).json({
+      success: true,
+      message: "Firm updated successfully",
+      data: updatedFirm,
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: `Failed to update firm: ${error.message}`,
+    });
   }
 };
 
@@ -34,15 +47,25 @@ const update_firm = async (req, res) => {
 const get_firm_by_id = async (req, res) => {
   try {
     const { id } = req.params;
-    const firm = await Firm.findById(id);
+    const firm = await firmService.get_firm_by_id(id);
 
     if (!firm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Firm not found with the provided ID",
+      });
     }
 
-    res.json({ success: true, data: firm });
+    res.status(200).json({
+      success: true,
+      message: "Firm fetched successfully",
+      data: firm,
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: `Failed to fetch firm: ${error.message}`,
+    });
   }
 };
 
@@ -50,25 +73,41 @@ const get_firm_by_id = async (req, res) => {
 const delete_firm = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedFirm = await Firm.findByIdAndDelete(id);
+    const deletedFirm = await firmService.delete_firm(id);
 
     if (!deletedFirm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Firm not found with the provided ID",
+      });
     }
 
-    res.json({ success: true, message: "Firm deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Firm deleted successfully",
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: `Failed to delete firm: ${error.message}`,
+    });
   }
 };
 
 // Get all firms
 const get_all_firm = async (req, res) => {
   try {
-    const firms = await Firm.find().sort({ firm_add_date: -1 });
-    res.json({ success: true, data: firms });
+    const firms = await firmService.get_all_firm();
+    res.status(200).json({
+      success: true,
+      message: "Firms fetched successfully",
+      data: firms,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: `Failed to fetch firms: ${error.message}`,
+    });
   }
 };
 
