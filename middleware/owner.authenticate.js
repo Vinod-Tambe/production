@@ -1,4 +1,4 @@
-const jwtProvider = require("../config/jwtProvider");
+const jwtProvider = require("../utils/jwtProvider");
 const ownerService = require("../services/owner.service");
 
 const owner_authentication = async (req, res, next) => {

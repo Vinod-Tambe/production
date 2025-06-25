@@ -22,3 +22,7 @@ module.exports=app;
 const authRouters=require("./routes/auth.route.js")
 app.use("/auth",authRouters)
 module.exports=app;
+
+const firmRouters=require("./routes/firm.route.js")
+app.use("/firm",firmRouters)
+module.exports=app;
