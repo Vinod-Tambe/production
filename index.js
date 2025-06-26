@@ -26,3 +26,7 @@ module.exports=app;
 const firmRouters=require("./routes/firm.route.js")
 app.use("/firm",firmRouters)
 module.exports=app;
+
+const userRouters=require("./routes/user.route.js")
+app.use("/user",userRouters)
+module.exports=app;
