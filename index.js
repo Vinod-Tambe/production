@@ -30,3 +30,7 @@ module.exports=app;
 const userRouters=require("./routes/user.route.js")
 app.use("/user",userRouters)
 module.exports=app;
+
+const accountRouters=require("./routes/account.route.js")
+app.use("/account",accountRouters)
+module.exports=app;
