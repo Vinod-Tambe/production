@@ -18,12 +18,12 @@ const owner_login = async (req, res) => {
     });
 
     if (!owner) {
-      return res.status(404).json({ success: false, message: 'Please enter the correct mobile number or login ID.' });
+      return res.status(200).json({ success: false, message: 'Please enter the correct mobile number or login ID.' });
     }
 
     const isPasswordValid = await bcrypt.compare(own_password, owner.own_password);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Please enter the correct password.' });
+      return res.status(200).json({ success: false, message: 'Please enter the correct password.' });
     }
 
     const token = jwtProvider.generateToken({ userId: owner._id });
@@ -59,12 +59,12 @@ const admin_login = async (req, res) => {
     });
 
     if (!admin) {
-      return res.status(404).json({ success: false, message: 'Admin not found' });
+      return res.status(200).json({ success: false, message: 'Admin not found' });
     }
 
     const isPasswordValid = await bcrypt.compare(admin_password, admin.admin_password);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Invalid password' });
+      return res.status(200).json({ success: false, message: 'Invalid password' });
     }
 
     const token = jwtProvider.generateToken({ adminId: admin._id });
