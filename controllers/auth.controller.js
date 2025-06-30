@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwtProvider = require('../utils/jwtProvider');
 
 // ============================
-// 🧑 OWNER LOGIN 
+// 🧑 OWNER LOGIN
 // ============================
 const owner_login = async (req, res) => {
   const { identifier, own_password } = req.body;
@@ -13,17 +13,17 @@ const owner_login = async (req, res) => {
     const owner = await Owner.findOne({
       $or: [
         { own_login_id: identifier },
-        { own_mobile_no: identifier }
+        ...(isNaN(identifier) ? [] : [{ own_mobile_no: Number(identifier) }])
       ]
     });
 
     if (!owner) {
-      return res.status(404).json({ success: false, message: 'Owner not found' });
+      return res.status(404).json({ success: false, message: 'Please enter the correct mobile number or login ID.' });
     }
 
     const isPasswordValid = await bcrypt.compare(own_password, owner.own_password);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Invalid password' });
+      return res.status(401).json({ success: false, message: 'Please enter the correct password.' });
     }
 
     const token = jwtProvider.generateToken({ userId: owner._id });
@@ -36,7 +36,7 @@ const owner_login = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Owner login successful',
+      message: 'Welcome back! Login successful.',
       token,
       data,
     });
@@ -88,6 +88,6 @@ const admin_login = async (req, res) => {
 
 
 module.exports = {
-    admin_login,
+  admin_login,
   owner_login
 };
