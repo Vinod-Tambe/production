@@ -1,36 +1,45 @@
-const express=require("express");
-const cors=require("cors");
-const path=require('path')
-const app=express();
-app.use(express.json())
-app.use(cors());
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
+const app = express();
+
+// Body parser
+app.use(express.json());
+
+// ✅ Proper CORS setup
+app.use(cors({
+  origin:  ['http://localhost:3000', 'http://khataboss.in'], // or add other allowed domains here
+  credentials: true,
+}));
+
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-const htmlPath = path.join(__dirname, './views/index.html'); 
-app.get("/",(req,res)=>{
-    return res.sendFile(htmlPath);
-})
 
-const ownerRouters=require("./routes/owner.route.js")
-app.use("/owner",ownerRouters)
-module.exports=app;
+// Serve homepage
+const htmlPath = path.join(__dirname, './views/index.html');
+app.get("/", (req, res) => {
+  return res.sendFile(htmlPath);
+});
 
-const adminRouters=require("./routes/admin.route.js")
-app.use("/admin",adminRouters)
-module.exports=app;
+// ✅ Route registration
+const ownerRouters = require("./routes/owner.route.js");
+app.use("/owner", ownerRouters);
 
-const authRouters=require("./routes/auth.route.js")
-app.use("/auth",authRouters)
-module.exports=app;
+const adminRouters = require("./routes/admin.route.js");
+app.use("/admin", adminRouters);
 
-const firmRouters=require("./routes/firm.route.js")
-app.use("/firm",firmRouters)
-module.exports=app;
+const authRouters = require("./routes/auth.route.js");
+app.use("/auth", authRouters);
 
-const userRouters=require("./routes/user.route.js")
-app.use("/user",userRouters)
-module.exports=app;
+const firmRouters = require("./routes/firm.route.js");
+app.use("/firm", firmRouters);
 
-const accountRouters=require("./routes/account.route.js")
-app.use("/account",accountRouters)
-module.exports=app;
+const userRouters = require("./routes/user.route.js");
+app.use("/user", userRouters);
+
+const accountRouters = require("./routes/account.route.js");
+app.use("/account", accountRouters);
+
+// ✅ Export only once at the end
+module.exports = app;
