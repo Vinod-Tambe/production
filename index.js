@@ -9,7 +9,7 @@ app.use(express.json());
 
 // ✅ Proper CORS setup
 app.use(cors({
-  origin:  ['http://localhost:3000', 'http://khataboss.in'], // or add other allowed domains here
+  origin:  ['http://localhost:3000', 'https://khataboss.com'], // or add other allowed domains here
   credentials: true,
 }));
 
