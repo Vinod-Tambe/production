@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+const { sendOTPEmail } = require("./mail.service");
 
 // ✅ Generate 6-digit OTP
 const generateOtp = () => {
@@ -9,25 +9,22 @@ const generateOtp = () => {
 const sendOtpToMail = async (email, otp) => {
   if (!email) throw new Error("Email is required to send OTP.");
 
-//   const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: "your_email@gmail.com",
-//       pass: "your_app_password", // App password, not Gmail password
-//     },
-//   });
+  try {
+    const sendStatus = await sendOTPEmail(email, otp);
 
-//   const mailOptions = {
-//     from: '"Your App Name" <your_email@gmail.com>',
-//     to: email,
-//     subject: "Your OTP Code",
-//     text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`,
-//   };
-
-//   await transporter.sendMail(mailOptions);
-
-  return { success: true, message: `OTP sent to email ${otp} successfully.` };
+    return {
+      success: true,
+      message: `OTP sent to email ${email} successfully.`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to send OTP to email ${email}.`,
+      error: error.message,
+    };
+  }
 };
+
 
 // ✅ Verify OTP (simple comparison)
 const verifyOtp = (main_otp, sent_otp) => {
