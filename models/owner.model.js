@@ -18,22 +18,22 @@ const ownerSchema = new mongoose.Schema({
   own_fname: {
     type: String,
     required: true,
-    index: true, // for faster name searches
+    index: true,
   },
-    own_mname: {
+  own_mname: {
     type: String,
     required: true,
-    index: true, // for faster name searches
+    index: true,
   },
   own_lname: {
     type: String,
     required: true,
-    index: true, // for faster name searches
+    index: true,
   },
   own_mobile_no: {
     type: Number,
     required: true,
-    unique: true, // enforce unique mobile numbers
+    unique: true,
     index: true,
   },
   own_phone_no: {
@@ -57,7 +57,7 @@ const ownerSchema = new mongoose.Schema({
   own_login_id: {
     type: String,
     unique: true,
-    sparse: true, // allows null values while enforcing uniqueness
+    sparse: true,
     index: true,
   },
   own_password: {
@@ -75,14 +75,25 @@ const ownerSchema = new mongoose.Schema({
   own_salt_index_key: {
     type: String,
   },
+  own_otp: {
+    type: String,
+  },
+  own_otp_expiry: {
+    type: String,
+  },
+  own_email: {
+    type: String,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true,
+    index: true,
+  },
 }, {
   timestamps: true,
 });
 
 // Auto-increment for own_id
 ownerSchema.plugin(AutoIncrement, { inc_field: "own_id" });
-
-// Compound index example (optional)
-// ownerSchema.index({ own_fname: 1, own_lname: 1 });
 
 module.exports = mongoose.model("Owner", ownerSchema);

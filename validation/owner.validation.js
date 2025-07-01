@@ -19,6 +19,13 @@ const ownerValidationSchema = Joi.object({
       "string.pattern.base": "Phone number must be a valid 10-digit number.",
     }),
 
+  own_email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required()
+    .messages({
+      "string.email": "Email must be a valid email address.",
+    }),
+
   own_city: Joi.string().max(100).required(),
   own_state: Joi.string().max(100).required(),
   own_country: Joi.string().max(100).required(),
@@ -27,8 +34,9 @@ const ownerValidationSchema = Joi.object({
 
   own_login_id: Joi.string().alphanum().min(4).max(50).required(),
 
-  own_password: Joi.string().min(6).max(100).required()
-    .messages({ "string.min": "Password must be at least 6 characters long." }),
+  own_password: Joi.string().min(6).max(100).required().messages({
+    "string.min": "Password must be at least 6 characters long.",
+  }),
 
   own_confirm_password: Joi.any()
     .valid(Joi.ref("own_password"))
@@ -41,6 +49,7 @@ const ownerValidationSchema = Joi.object({
   own_payment_gateway: Joi.string()
     .valid("PhonePe", "Razorpay", "Paytm", "Stripe")
     .required(),
+
   own_merchant_id: Joi.string().max(100).required(),
   own_salt_key: Joi.string().max(100).required(),
   own_salt_index_key: Joi.string().max(10).required(),

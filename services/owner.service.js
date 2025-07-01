@@ -5,14 +5,26 @@ const bcrypt = require("bcrypt");
 // ✅ Create a new owner
 const create_new_owner = async (owner_data) => {
   try {
-    const isOwnerExist = await Owner.findOne({
+    // ✅ Check if mobile number already exists
+    const isMobileExist = await Owner.findOne({
       own_mobile_no: owner_data.own_mobile_no,
     });
 
-    if (isOwnerExist) {
+    if (isMobileExist) {
       throw new Error(
         "Owner already exists with mobile no: " + owner_data.own_mobile_no
       );
+    }
+
+    // ✅ Check if email already exists (if provided)
+    if (owner_data.own_email) {
+      const isEmailExist = await Owner.findOne({
+        own_email: owner_data.own_email.toLowerCase().trim(),
+      });
+
+      if (isEmailExist) {
+        throw new Error("Owner already exists with email: " + owner_data.own_email);
+      }
     }
 
     const hashedPassword = await bcrypt.hash(owner_data.own_password, 8);
@@ -23,6 +35,7 @@ const create_new_owner = async (owner_data) => {
       own_lname: owner_data.own_lname,
       own_mobile_no: owner_data.own_mobile_no,
       own_phone_no: owner_data.own_phone_no,
+      own_email: owner_data.own_email.toLowerCase().trim(),
       own_city: owner_data.own_city,
       own_state: owner_data.own_state,
       own_country: owner_data.own_country,
@@ -41,6 +54,7 @@ const create_new_owner = async (owner_data) => {
     throw new Error(error.message);
   }
 };
+
 
 // ✅ Update owner by ID
 const update_owner_by_id = async (owner_id, updated_data) => {
