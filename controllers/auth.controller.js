@@ -74,7 +74,7 @@ const send_owner_otp = async (req, res) => {
 
     await otpService.sendOtpToMail(owner.own_email, otp);
 
-    res.status(200).json({ success: true, message: `OTP sent to ${otp} ${owner.own_email}.` });
+    res.status(200).json({ success: true, message: `OTP sent to ${owner.own_email}.` });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to send OTP', error: error.message });
   }
