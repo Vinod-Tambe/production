@@ -23,7 +23,7 @@ router.delete("/delete/:id", adminAuthenticate,delete_owner);
 router.post("/forgot-password",adminAuthenticate, forgot_password);
 
 // ✅ Get a specific owner by ID
-router.get("/get/:id",adminAuthenticate, get_owner_by_id);
+router.get("/get/:id", get_owner_by_id);
 
 // ✅ Get all owners
 router.get("/get-all",adminAuthenticate, get_all_owners);
