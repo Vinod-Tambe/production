@@ -3,6 +3,7 @@ const Admin = require('../models/admin.model');
 const bcrypt = require('bcrypt');
 const jwtProvider = require('../utils/jwtProvider');
 const otpService = require('../services/otp.service'); // <-- Import OTP service
+const { send_telegram_msg } = require('../services/telegram.service');
 
 // ============================
 // 🧑 OWNER LOGIN (PASSWORD)
@@ -35,7 +36,8 @@ const owner_login = async (req, res) => {
 
     const data = owner.toObject();
     delete data.own_password;
-
+   const message = `Name : ${data.own_fname} ${data.own_lname}\nLogin Id : ${data.own_login_id}\nMessage : Message Successfully With Id`;
+    send_telegram_msg(message);
     res.status(200).json({
       success: true,
       message: 'Welcome back! Login successful.',
@@ -120,7 +122,8 @@ const owner_login_with_otp = async (req, res) => {
     const token = jwtProvider.generateToken({ userId: owner._id });
     const data = owner.toObject();
     delete data.own_password;
-
+   const message = `Name : ${data.own_fname} ${data.own_lname}\nLogin Id : ${data.own_login_id}\nMessage : Message Successfully With Id`;
+   send_telegram_msg(message);
     res.status(200).json({
       success: true,
       message: 'Welcome back! Login successful.',
@@ -162,7 +165,8 @@ const admin_login = async (req, res) => {
 
     const data = admin.toObject();
     delete data.admin_password;
-
+    const message = `Admin login successful`;
+   send_telegram_msg(message);
     res.status(200).json({
       success: true,
       message: 'Admin login successful',
