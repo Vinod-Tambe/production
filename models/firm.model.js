@@ -84,7 +84,9 @@ const firmSchema = new mongoose.Schema({
   firm_smtp_email: String,
   firm_smtp_pass: String,
   firm_bank_name: String,
+  firm_bank_acc_no: String,
   firm_bank_branch: String,
+  firm_bank_address: String,
   firm_acc_holder: String,
   firm_acc_type: {
     type: String,
@@ -113,7 +115,7 @@ const firmSchema = new mongoose.Schema({
     type: String,
     match: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
   },
-  firm_form_head: String,
+  firm_form_header: String,
   firm_form_footer: String,
   firm_own_sign: String,
   firm_left_logo_id: String,
