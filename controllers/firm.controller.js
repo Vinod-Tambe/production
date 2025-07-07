@@ -25,19 +25,19 @@ const create_firm = async (req, res) => {
 
     if (existingFirm) {
       if (existingFirm.firm_phone_no === firm_phone_no) {
-        return res.status(409).json({
+        return res.status(200).json({
           success: false,
           message: "Phone Number already linked to another firm.",
         });
       }
       if (existingFirm.firm_email_id === firm_email_id) {
-        return res.status(409).json({
+        return res.status(200).json({
           success: false,
           message: "Email Id already linked to another firm.",
         });
       }
       if (existingFirm.firm_reg_no === firm_reg_no) {
-        return res.status(409).json({
+        return res.status(200).json({
           success: false,
           message: "Register No already linked to another firm.",
         });
@@ -47,13 +47,13 @@ const create_firm = async (req, res) => {
     // Create new firm if no duplicates found
     const savedFirm = await firmService.create_firm(req.body);;
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "Firm created successfully.",
       data: savedFirm,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: `Failed to create firm: ${error.message}`,
     });
@@ -71,7 +71,7 @@ const update_firm = async (req, res) => {
     const updatedFirm = await firmService.update_firm(id, req.body);
 
     if (!updatedFirm) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "Firm not found with the provided ID",
       });
@@ -83,7 +83,7 @@ const update_firm = async (req, res) => {
       data: updatedFirm,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: `Failed to update firm: ${error.message}`,
     });
@@ -97,7 +97,7 @@ const get_firm_by_id = async (req, res) => {
     const firm = await firmService.get_firm_by_id(id);
 
     if (!firm) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "Firm not found with the provided ID",
       });
@@ -109,7 +109,7 @@ const get_firm_by_id = async (req, res) => {
       data: firm,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: `Failed to fetch firm: ${error.message}`,
     });
@@ -134,7 +134,7 @@ const delete_firm = async (req, res) => {
       message: "Firm deleted successfully",
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: `Failed to delete firm: ${error.message}`,
     });
@@ -151,7 +151,7 @@ const get_all_firm = async (req, res) => {
       data: firms,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: `Failed to fetch firms: ${error.message}`,
     });
