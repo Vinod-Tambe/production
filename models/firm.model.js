@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
@@ -8,7 +9,6 @@ const firmSchema = new mongoose.Schema({
   },
   firm_own_id: {
     type: Number,
-    required: true,
   },
   firm_name: {
     type: String,
@@ -17,6 +17,7 @@ const firmSchema = new mongoose.Schema({
   },
   firm_reg_no: {
     type: String,
+    required:true,
     trim: true,
     unique: true,
     sparse: true, // allows multiple docs with null
@@ -32,17 +33,14 @@ const firmSchema = new mongoose.Schema({
   },
   firm_address: {
     type: String,
-    required: true,
     trim: true,
   },
   firm_city: {
     type: String,
-    required: true,
     trim: true,
   },
   firm_pincode: {
     type: String,
-    required: true,
     match: /^[0-9]{6}$/,
   },
   firm_phone_no: {

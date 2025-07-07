@@ -1,99 +1,114 @@
-const Firm = require("../models/firm.model");
-const { validateFirm } = require("../validators/firm.validator");
+const Joi = require("joi");
 
-// Create new firm
-const create_firm = async (req, res) => {
-  try {
-    const { error } = validateFirm(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        errors: error.details.map((err) => err.message),
-      });
-    }
+const createFirmSchema = Joi.object({
+  firm_name: Joi.string().trim().required().messages({
+    "string.base": "Firm name must be a string",
+    "string.empty": "Firm name is required",
+    "any.required": "Firm name is required",
+  }),
 
-    const newFirm = new Firm(req.body);
-    const savedFirm = await newFirm.save();
+  firm_reg_no: Joi.string().trim().required().messages({
+    "string.empty": "Firm registration number is required",
+    "any.required": "Firm registration number is required",
+  }),
 
-    res.status(201).json({ success: true, data: savedFirm });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  firm_shop_name: Joi.string().trim().required().messages({
+    "string.empty": "Shop name is required",
+    "any.required": "Shop name is required",
+  }),
 
-// Update existing firm
-const update_firm = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { error } = validateFirm(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        errors: error.details.map((err) => err.message),
-      });
-    }
+  firm_desc: Joi.string().allow("").messages({
+    "string.base": "Firm description must be a string",
+  }),
 
-    const updatedFirm = await Firm.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+  firm_address: Joi.string().allow("").messages({
+    "string.base": "Address must be a string",
+  }),
 
-    if (!updatedFirm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
-    }
+  firm_city: Joi.string().allow("").messages({
+    "string.base": "City must be a string",
+  }),
 
-    res.json({ success: true, data: updatedFirm });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  firm_pincode: Joi.string().pattern(/^[0-9]{6}$/).messages({
+    "string.pattern.base": "Pincode must be a 6-digit number",
+  }),
 
-// Get firm by ID
-const get_firm_by_id = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const firm = await Firm.findById(id);
+  firm_phone_no: Joi.string().pattern(/^[0-9]{10}$/).required().messages({
+    "string.pattern.base": "Phone number must be 10 digits",
+    "string.empty": "Phone number is required",
+    "any.required": "Phone number is required",
+  }),
 
-    if (!firm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
-    }
+  firm_email_id: Joi.string().email().required().messages({
+    "string.email": "Please provide a valid email address",
+    "string.empty": "Email ID is required",
+    "any.required": "Email ID is required",
+  }),
 
-    res.json({ success: true, data: firm });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  firm_website: Joi.string().uri().allow("").messages({
+    "string.uri": "Website must be a valid URL",
+  }),
 
-// Delete firm
-const delete_firm = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedFirm = await Firm.findByIdAndDelete(id);
+  firm_type: Joi.string().valid("Sole Proprietorship", "Partnership", "LLP", "Private Ltd", "Other").messages({
+    "any.only": "Firm type must be one of: Sole Proprietorship, Partnership, LLP, Private Ltd, Other",
+  }),
 
-    if (!deletedFirm) {
-      return res.status(404).json({ success: false, message: "Firm not found" });
-    }
+  firm_owner: Joi.string().trim().required().messages({
+    "string.empty": "Firm owner is required",
+    "any.required": "Firm owner is required",
+  }),
 
-    res.json({ success: true, message: "Firm deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  firm_other_info: Joi.string().allow(""),
+  firm_geo_latitude: Joi.string().allow(""),
+  firm_geo_longitude: Joi.string().allow(""),
+  firm_whatsapp_link: Joi.string().allow(""),
+  firm_facebook_link: Joi.string().allow(""),
+  firm_insta_link: Joi.string().allow(""),
+  firm_smtp_server: Joi.string().allow(""),
+  firm_smtp_port: Joi.number().allow(null),
+  firm_smtp_email: Joi.string().email().allow("").messages({
+    "string.email": "SMTP Email must be a valid email",
+  }),
+  firm_smtp_pass: Joi.string().allow(""),
 
-// Get all firms
-const get_all_firm = async (req, res) => {
-  try {
-    const firms = await Firm.find().sort({ createdAt: -1 });
-    res.json({ success: true, data: firms });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  firm_bank_name: Joi.string().allow(""),
+  firm_bank_acc_no: Joi.string().allow(""),
+  firm_bank_branch: Joi.string().allow(""),
+  firm_bank_address: Joi.string().allow(""),
+  firm_acc_holder: Joi.string().allow(""),
+  firm_acc_type: Joi.string().allow(""),
+
+  firm_ifsc_code: Joi.string().pattern(/^[A-Z]{4}0[A-Z0-9]{6}$/).messages({
+    "string.pattern.base": "IFSC Code must follow standard format like ABCD0EFG123",
+  }),
+
+  firm_pay_declaration: Joi.string().allow(""),
+  firm_api_key: Joi.string().allow(""),
+  firm_start_date: Joi.date().allow(null),
+  firm_balance: Joi.number().messages({
+    "number.base": "Balance must be a number",
+  }),
+
+  firm_balance_type: Joi.string().valid("DR", "CR").messages({
+    "any.only": "Balance type must be either DR or CR",
+  }),
+
+  firm_gstin_no: Joi.string().pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).messages({
+    "string.pattern.base": "GSTIN must be a valid GST number",
+  }),
+
+  firm_pan_no: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).messages({
+    "string.pattern.base": "PAN number must be valid (e.g., ABCDE1234F)",
+  }),
+
+  firm_form_header: Joi.string().allow(""),
+  firm_form_footer: Joi.string().allow(""),
+  firm_own_sign: Joi.string().allow(""),
+  firm_left_logo_id: Joi.string().allow(""),
+  firm_right_logo_id: Joi.string().allow(""),
+  firm_qr_logo_id: Joi.string().allow(""),
+});
 
 module.exports = {
-  create_firm,
-  update_firm,
-  get_firm_by_id,
-  delete_firm,
-  get_all_firm,
+  createFirmSchema,
 };
