@@ -1,8 +1,10 @@
 const firmService = require("../services/firm.service");
 const { createFirmSchema } = require("../validation/firm_validation");
 const Firm = require('../models/firm.model');
+const { getOwnerIdFromToken } = require("../utils/tokenHelper");
 const create_firm = async (req, res) => {
   try {
+    const ownerId = await getOwnerIdFromToken(req);
     // Validate input
     const { error } = createFirmSchema.validate(req.body, { abortEarly: false });
     if (error) {
@@ -14,7 +16,6 @@ const create_firm = async (req, res) => {
 
     const { firm_phone_no, firm_email_id, firm_reg_no } = req.body;
 
-    // Check if phone number, email, or registration number already exists
     const existingFirm = await Firm.findOne({
       $or: [
         { firm_phone_no },
@@ -24,36 +25,36 @@ const create_firm = async (req, res) => {
     });
 
     if (existingFirm) {
-      if (existingFirm.firm_phone_no === firm_phone_no) {
-        return res.status(200).json({
-          success: false,
-          message: "Phone Number already linked to another firm.",
-        });
-      }
-      if (existingFirm.firm_email_id === firm_email_id) {
-        return res.status(200).json({
-          success: false,
-          message: "Email Id already linked to another firm.",
-        });
-      }
-      if (existingFirm.firm_reg_no === firm_reg_no) {
-        return res.status(200).json({
-          success: false,
-          message: "Register No already linked to another firm.",
-        });
+      const fieldMap = {
+        firm_phone_no: "Phone Number",
+        firm_email_id: "Email Id",
+        firm_reg_no: "Register No"
+      };
+
+      for (const key of Object.keys(fieldMap)) {
+        if (existingFirm[key] === req.body[key]) {
+          return res.status(200).json({
+            success: false,
+            message: `${fieldMap[key]} already linked to another firm.`,
+          });
+        }
       }
     }
 
-    // Create new firm if no duplicates found
-    const savedFirm = await firmService.create_firm(req.body);;
+    // Assign owner ID to request body
+    req.body.firm_own_id = ownerId;
+
+    // Create firm
+    const savedFirm = await firmService.create_firm(req.body);
 
     return res.status(200).json({
       success: true,
       message: "Firm created successfully.",
       data: savedFirm,
     });
+
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
       message: `Failed to create firm: ${error.message}`,
     });

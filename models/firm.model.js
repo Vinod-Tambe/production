@@ -9,6 +9,7 @@ const firmSchema = new mongoose.Schema({
   },
   firm_own_id: {
     type: Number,
+    required: true,
   },
   firm_name: {
     type: String,
