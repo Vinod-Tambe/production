@@ -106,7 +106,7 @@ const createFirmSchema = Joi.object({
   firm_own_sign: Joi.string().allow(""),
   firm_left_logo_id: Joi.string().allow(""),
   firm_right_logo_id: Joi.string().allow(""),
-  firm_qr_logo_id: Joi.string().allow(""),
+  firm_qr_code_id: Joi.string().allow(""),
 });
 
 module.exports = {

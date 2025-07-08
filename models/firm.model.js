@@ -119,7 +119,7 @@ const firmSchema = new mongoose.Schema({
   firm_own_sign: String,
   firm_left_logo_id: String,
   firm_right_logo_id: String,
-  firm_qr_logo_id: String,
+  firm_qr_code_id: String,
 }, {
   timestamps: true,
 });

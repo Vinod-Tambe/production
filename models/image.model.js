@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const imageSchema = new mongoose.Schema({
-  img_id: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   img_own_id: {
-    type: Number,
-    required: true,
-  },
-  img_firm_id: {
     type: Number,
     required: true,
   },
@@ -22,11 +14,14 @@ const imageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-    img_prefix: {
+  img_ext: {
     type: String,
     required: true,
   },
 });
+
+// ✅ Correct plugin usage here
+imageSchema.plugin(AutoIncrement, { inc_field: 'img_id' });
 
 const Image = mongoose.model('Image', imageSchema);
 

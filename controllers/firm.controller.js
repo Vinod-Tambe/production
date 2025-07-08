@@ -2,6 +2,7 @@ const firmService = require("../services/firm.service");
 const { createFirmSchema } = require("../validation/firm_validation");
 const Firm = require('../models/firm.model');
 const { getOwnerIdFromToken } = require("../utils/tokenHelper");
+const { add_new_image } = require("../services/image.service");
 const create_firm = async (req, res) => {
   try {
     const ownerId = await getOwnerIdFromToken(req);
@@ -43,7 +44,16 @@ const create_firm = async (req, res) => {
 
     // Assign owner ID to request body
     req.body.firm_own_id = ownerId;
-
+    const imageData = {
+      firm_left_logo_id: { img_own_id: 2, img_name: req.body.firm_left_logo_id },
+      firm_right_logo_id: { img_own_id: 2, img_name: req.body.firm_right_logo_id },
+      firm_qr_code_id: { img_own_id: 2, img_name: req.body.firm_qr_code_id },
+    };
+    const insertedImages = await add_new_image(imageData,);
+    req.body = {
+      ...req.body,
+      ...insertedImages,
+    };
     // Create firm
     const savedFirm = await firmService.create_firm(req.body);
 
