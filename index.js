@@ -41,8 +41,8 @@ app.use("/user", userRouters);
 const accountRouters = require("./routes/account.route.js");
 app.use("/account", accountRouters);
 
-const uploadRouters = require("./routes/upload.route.js");
-app.use("/file", uploadRouters);
+// const uploadRouters = require("./routes/upload.route.js");
+// app.use("/file", uploadRouters);
 
 // ✅ Export only once at the end
 module.exports = app;

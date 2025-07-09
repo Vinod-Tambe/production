@@ -1,83 +1,61 @@
 const firmService = require("../services/firm.service");
 const { createFirmSchema } = require("../validation/firm_validation");
-const Firm = require('../models/firm.model');
 const { getOwnerIdFromToken } = require("../utils/tokenHelper");
 const { add_new_image } = require("../services/image.service");
+const { saveFiles } = require("../services/file.service");  // Import the new service
+
 const create_firm = async (req, res) => {
   try {
     const ownerId = await getOwnerIdFromToken(req);
+
     // Validate input
     const { error } = createFirmSchema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.details[0].message,
-      });
+      return res.status(400).json({ success: false, message: error.details[0].message });
     }
 
-    const { firm_phone_no, firm_email_id, firm_reg_no } = req.body;
-
-    const existingFirm = await Firm.findOne({
-      $or: [
-        { firm_phone_no },
-        { firm_email_id },
-        { firm_reg_no }
-      ]
-    });
-
-    if (existingFirm) {
-      const fieldMap = {
-        firm_phone_no: "Phone Number",
-        firm_email_id: "Email Id",
-        firm_reg_no: "Register No"
-      };
-
-      for (const key of Object.keys(fieldMap)) {
-        if (existingFirm[key] === req.body[key]) {
-          return res.status(200).json({
-            success: false,
-            message: `${fieldMap[key]} already linked to another firm.`,
-          });
-        }
-      }
-    }
-
-    // Assign owner ID to request body
     req.body.firm_own_id = ownerId;
     const imageData = {};
 
-if (req.body.firm_left_logo_id) {
-  imageData.firm_left_logo_id = {
-    img_own_id: ownerId,
-    img_name: req.body.firm_left_logo_id,
-  };
-}
+    if (req.body.firm_left_logo_id) {
+      imageData.firm_left_logo_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_left_logo_id,
+      };
+    }
 
-if (req.body.firm_right_logo_id) {
-  imageData.firm_right_logo_id = {
-    img_own_id: ownerId,
-    img_name: req.body.firm_right_logo_id,
-  };
-}
+    if (req.body.firm_right_logo_id) {
+      imageData.firm_right_logo_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_right_logo_id,
+      };
+    }
 
-if (req.body.firm_qr_code_id) {
-  imageData.firm_qr_code_id = {
-    img_own_id: ownerId,
-    img_name: req.body.firm_qr_code_id,
-  };
-}
+    if (req.body.firm_qr_code_id) {
+      imageData.firm_qr_code_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_qr_code_id,
+      };
+    }
+    // Create the firm first
+    const savedFirm = await firmService.create_firm(req.body);
+
+    // Directory to save uploaded images
     const insertedImages = await add_new_image(imageData,);
     req.body = {
       ...req.body,
       ...insertedImages,
     };
-    // Create firm
-    const savedFirm = await firmService.create_firm(req.body);
+    // Save files with the new service and get filenames
+    const upload_right_logo_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_right_logo_id);
+    const upload_left_logo_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_left_logo_id);
+    const upload_qr_code_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_qr_code_id);
+
+    // Optionally save file names to the firm record or do other logic here
 
     return res.status(200).json({
       success: true,
-      message: "Firm created successfully.",
-      data: savedFirm,
+      message: "Firm created successfully."
     });
 
   } catch (error) {
@@ -87,7 +65,6 @@ if (req.body.firm_qr_code_id) {
     });
   }
 };
-
 
 // Update existing firm
 const update_firm = async (req, res) => {

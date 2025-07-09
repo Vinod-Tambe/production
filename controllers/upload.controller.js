@@ -1,31 +1,37 @@
-const uploadService = require('../services/upload.service');
+const uploadService = require("../services/file.service");
 
-const uploadImage = async (req, res) => {
+const uploadImages = async (req, res) => {
   try {
-    // Check if a file was uploaded
-    if (!req.file) {
-      return res.status(200).json({ success: false, message: 'No image file uploaded' });
+    // Check if files are uploaded
+    if (!req.files || !req.files.imgfile || !req.files.newimg) {
+      return res.status(400).json({ submit: false, msg: "Both files are required." });
     }
 
-    // Call the service to handle the uploaded file
-    const result = await uploadService.processUpload(req.file);
+    // Normalize to arrays for easier processing
+    const imgfiles = Array.isArray(req.files.imgfile) ? req.files.imgfile : [req.files.imgfile];
+    const newimgs = Array.isArray(req.files.newimg) ? req.files.newimg : [req.files.newimg];
 
-    // Return a success response with file details
-    res.status(200).json({
-      success: true,
-      message: 'Image uploaded successfully',
-      data: result
+    // Check if the number of files match (optional)
+    if (imgfiles.length !== newimgs.length) {
+      return res.status(400).json({ submit: false, msg: "The number of imgfile and newimg files must match." });
+    }
+
+    // Process all file pairs in parallel or sequentially
+    const uploadResults = [];
+    for (let i = 0; i < imgfiles.length; i++) {
+      const result = await uploadService.processImageUpload(imgfiles[i], newimgs[i]);
+      uploadResults.push(result);
+    }
+
+    // Return array of uploaded files info
+    res.json({
+      submit: true,
+      files: uploadResults, // array of { image: ..., newimg: ... }
     });
-  } catch (error) {
-    console.error('Upload error:', error.message);
-    res.status(200).json({
-      success: false,
-      message: 'Server error during upload',
-      error: error.message
-    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ submit: false, msg: "Server error during file upload." });
   }
 };
 
-module.exports = {
-  uploadImage
-};
+module.exports = { uploadImages };
