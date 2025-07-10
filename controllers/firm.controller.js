@@ -39,6 +39,14 @@ const create_firm = async (req, res) => {
         img_name: req.body.firm_qr_code_id,
       };
     }
+       // Insert image references (if any)
+    const insertedImages = await add_new_image(imageData);
+
+    // Attach new image IDs to req.body for file saving
+    req.body = {
+      ...req.body,
+      ...insertedImages,
+    };
 
     // Create firm
     const savedFirm = await firmService.create_firm(req.body);
@@ -49,15 +57,6 @@ const create_firm = async (req, res) => {
         message: savedFirm.message,
       });
     }
-
-    // Insert image references (if any)
-    const insertedImages = await add_new_image(imageData);
-
-    // Attach new image IDs to req.body for file saving
-    req.body = {
-      ...req.body,
-      ...insertedImages,
-    };
 
     // Save uploaded image files (if present)
     if (req.files) {
