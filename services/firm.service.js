@@ -1,8 +1,5 @@
 const Firm = require("../models/firm.model");
 
-// Create new firm
-const Firm = require("../models/firm");
-
 const create_firm = async (firmData) => {
   try {
     // 1. Check required fields
