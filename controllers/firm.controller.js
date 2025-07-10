@@ -8,54 +8,74 @@ const create_firm = async (req, res) => {
   try {
     const ownerId = await getOwnerIdFromToken(req);
 
-    // Validate input
+    // Validate request body using Joi schema
     const { error } = createFirmSchema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({ success: false, message: error.details[0].message });
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message).join(", "),
+      });
     }
 
     req.body.firm_own_id = ownerId;
-    const imageData = {};
 
+    // Prepare image data if logos/QR provided
+    const imageData = {};
     if (req.body.firm_left_logo_id) {
       imageData.firm_left_logo_id = {
         img_own_id: ownerId,
         img_name: req.body.firm_left_logo_id,
       };
     }
-
     if (req.body.firm_right_logo_id) {
       imageData.firm_right_logo_id = {
         img_own_id: ownerId,
         img_name: req.body.firm_right_logo_id,
       };
     }
-
     if (req.body.firm_qr_code_id) {
       imageData.firm_qr_code_id = {
         img_own_id: ownerId,
         img_name: req.body.firm_qr_code_id,
       };
     }
-    // Create the firm first
+
+    // Create firm
     const savedFirm = await firmService.create_firm(req.body);
 
-    // Directory to save uploaded images
-    const insertedImages = await add_new_image(imageData,);
+    if (!savedFirm.success) {
+      return res.status(400).json({
+        success: false,
+        message: savedFirm.message,
+      });
+    }
+
+    // Insert image references (if any)
+    const insertedImages = await add_new_image(imageData);
+
+    // Attach new image IDs to req.body for file saving
     req.body = {
       ...req.body,
       ...insertedImages,
     };
-    // Save files with the new service and get filenames
-    const upload_right_logo_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_right_logo_id);
-    const upload_left_logo_file= await saveFiles(req.files.left_logo_file,ownerId, insertedImages.firm_left_logo_id);
-    const upload_qr_code_file= await saveFiles(req.files.qr_code_file,ownerId, insertedImages.firm_qr_code_id);
 
-    // Optionally save file names to the firm record or do other logic here
+    // Save uploaded image files (if present)
+    if (req.files) {
+      if (req.files.left_logo_file) {
+        await saveFiles(req.files.left_logo_file, ownerId, insertedImages.firm_left_logo_id);
+      }
+      if (req.files.right_logo_file) {
+        await saveFiles(req.files.right_logo_file, ownerId, insertedImages.firm_right_logo_id);
+      }
+      if (req.files.qr_code_file) {
+        await saveFiles(req.files.qr_code_file, ownerId, insertedImages.firm_qr_code_id);
+      }
+    }
 
     return res.status(200).json({
       success: true,
-      message: "Firm created successfully."
+      message: "Firm created successfully.",
+      data: savedFirm.data, // optional: return created firm
     });
 
   } catch (error) {
