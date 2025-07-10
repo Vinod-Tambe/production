@@ -48,8 +48,8 @@ const create_firm = async (req, res) => {
     };
     // Save files with the new service and get filenames
     const upload_right_logo_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_right_logo_id);
-    const upload_left_logo_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_left_logo_id);
-    const upload_qr_code_file= await saveFiles(req.files.right_logo_file,ownerId, insertedImages.firm_qr_code_id);
+    const upload_left_logo_file= await saveFiles(req.files.left_logo_file,ownerId, insertedImages.firm_left_logo_id);
+    const upload_qr_code_file= await saveFiles(req.files.qr_code_file,ownerId, insertedImages.firm_qr_code_id);
 
     // Optionally save file names to the firm record or do other logic here
 

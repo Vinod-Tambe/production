@@ -1,4 +1,6 @@
 const Image = require('../models/image.model');
+const path = require("path");
+const fs = require("fs");
 
 // Add a new image
 const add_new_image = async (imagesObj) => {
@@ -28,8 +30,19 @@ const add_new_image = async (imagesObj) => {
   return result;
 };
 
-
-
+const get_image_id = (imageName) => {
+  return new Promise((resolve, reject) => {
+    // Assuming your images are stored in a folder called 'public/images'
+    const imagePath = path.join(__dirname, "..", "public", "images", imageName);
+    // Check if file exists
+    fs.access(imagePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        return reject(new Error("Image not found"));
+      }
+      resolve(imagePath);
+    });
+  });
+};
 
 // Get all images
 const get_all_images = async () => {
@@ -82,4 +95,5 @@ module.exports = {
   get_image_by_id,
   update_image,
   delete_image,
+  get_image_id
 };

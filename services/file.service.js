@@ -13,7 +13,7 @@ const saveFiles = async (file, ownerId, uniqueName) => {
   }
 
   // Build upload directory path
-  const uploadDir = path.join(__dirname, '..', 'images', String(ownerId));
+  const uploadDir = path.join(__dirname, '..', "public", "images", String(ownerId));
   await fs.mkdir(uploadDir, { recursive: true });
 
   //const savedFileNames = [];
