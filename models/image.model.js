@@ -5,6 +5,7 @@ const imageSchema = new mongoose.Schema({
   img_own_id: {
     type: Number,
     required: true,
+    default: 0,
   },
   img_add_date: {
     type: Date,
@@ -13,14 +14,16 @@ const imageSchema = new mongoose.Schema({
   img_name: {
     type: String,
     required: true,
+    default: "",
   },
   img_ext: {
     type: String,
     required: true,
+    default: "",
   },
 });
 
-// ✅ Correct plugin usage here
+// ✅ Auto-increment for img_id
 imageSchema.plugin(AutoIncrement, { inc_field: 'img_id' });
 
 const Image = mongoose.model('Image', imageSchema);

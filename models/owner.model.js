@@ -8,78 +8,99 @@ const ownerSchema = new mongoose.Schema({
   },
   own_add_date: {
     type: Date,
+    default: Date.now,
   },
   own_soft_date: {
     type: Date,
+    default: null,
   },
   own_last_login: {
     type: Date,
+    default: null,
   },
   own_fname: {
     type: String,
     required: true,
     index: true,
+    default: "",
   },
   own_mname: {
     type: String,
     required: true,
     index: true,
+    default: "",
   },
   own_lname: {
     type: String,
     required: true,
     index: true,
+    default: "",
   },
   own_mobile_no: {
     type: Number,
     required: true,
     unique: true,
     index: true,
+    default: 0,
   },
   own_phone_no: {
     type: Number,
+    default: 0,
   },
   own_city: {
     type: String,
+    default: "",
   },
   own_state: {
     type: String,
+    default: "",
   },
   own_country: {
     type: String,
+    default: "",
   },
   own_village: {
     type: String,
+    default: "",
   },
   own_address: {
     type: String,
+    default: "",
   },
   own_login_id: {
     type: String,
     unique: true,
     sparse: true,
     index: true,
+    default: "",
   },
   own_password: {
     type: String,
+    default: "",
   },
   own_payment_gateway: {
     type: String,
+    default: "",
   },
   own_merchant_id: {
     type: String,
+    default: "",
   },
   own_salt_key: {
     type: String,
+    default: "",
   },
   own_salt_index_key: {
     type: String,
+    default: "",
   },
   own_otp: {
     type: String,
+    default: "",
   },
   own_otp_expiry: {
     type: String,
+    default: "",
   },
   own_email: {
     type: String,
@@ -88,12 +109,12 @@ const ownerSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
     index: true,
+    default: "",
   },
 }, {
   timestamps: true,
 });
 
-// Auto-increment for own_id
 ownerSchema.plugin(AutoIncrement, { inc_field: "own_id" });
 
 module.exports = mongoose.model("Owner", ownerSchema);
