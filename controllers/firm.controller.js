@@ -1,8 +1,8 @@
 const firmService = require("../services/firm.service");
-const { createFirmSchema } = require("../validation/firm_validation");
+const { createFirmSchema, updateFirmSchema } = require("../validation/firm_validation");
 const { getOwnerIdFromToken } = require("../utils/tokenHelper");
 const { add_new_image } = require("../services/image.service");
-const { saveFiles } = require("../services/file.service");  // Import the new service
+const { saveFiles } = require("../services/file.service");
 
 const create_firm = async (req, res) => {
   try {
@@ -39,7 +39,7 @@ const create_firm = async (req, res) => {
         img_name: req.body.firm_qr_code_id,
       };
     }
-       // Insert image references (if any)
+    // Insert image references (if any)
     const insertedImages = await add_new_image(imageData);
 
     // Attach new image IDs to req.body for file saving
@@ -74,7 +74,7 @@ const create_firm = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Firm created successfully.",
-      data: savedFirm.data, // optional: return created firm
+      data: savedFirm.data,
     });
 
   } catch (error) {
@@ -89,16 +89,68 @@ const create_firm = async (req, res) => {
 const update_firm = async (req, res) => {
   try {
     const { id } = req.params;
+    const ownerId = await getOwnerIdFromToken(req);
 
-    // Optional: validate req.body here with a separate update schema
+    // Validate request body using Joi schema
+    const { error } = updateFirmSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message).join(", "),
+      });
+    }
 
+    // Prepare image data if logos/QR provided
+    const imageData = {};
+    if (req.body.firm_left_logo_id) {
+      imageData.firm_left_logo_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_left_logo_id,
+      };
+    }
+    if (req.body.firm_right_logo_id) {
+      imageData.firm_right_logo_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_right_logo_id,
+      };
+    }
+    if (req.body.firm_qr_code_id) {
+      imageData.firm_qr_code_id = {
+        img_own_id: ownerId,
+        img_name: req.body.firm_qr_code_id,
+      };
+    }
+
+    // Insert image references (if any)
+    const insertedImages = await add_new_image(imageData);
+
+    // Attach new image IDs to req.body for file saving
+    req.body = {
+      ...req.body,
+      ...insertedImages,
+    };
+
+    // Update firm
     const updatedFirm = await firmService.update_firm(id, req.body);
 
     if (!updatedFirm) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Firm not found with the provided ID",
       });
+    }
+
+    // Save uploaded image files (if present)
+    if (req.files) {
+      if (req.files.left_logo_file) {
+        await saveFiles(req.files.left_logo_file, ownerId, insertedImages.firm_left_logo_id || updatedFirm.firm_left_logo_id);
+      }
+      if (req.files.right_logo_file) {
+        await saveFiles(req.files.right_logo_file, ownerId, insertedImages.firm_right_logo_id || updatedFirm.firm_right_logo_id);
+      }
+      if (req.files.qr_code_file) {
+        await saveFiles(req.files.qr_code_file, ownerId, insertedImages.firm_qr_code_id || updatedFirm.firm_qr_code_id);
+      }
     }
 
     return res.status(200).json({
@@ -107,7 +159,7 @@ const update_firm = async (req, res) => {
       data: updatedFirm,
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
       message: `Failed to update firm: ${error.message}`,
     });
@@ -121,7 +173,7 @@ const get_firm_by_id = async (req, res) => {
     const firm = await firmService.get_firm_by_id(id);
 
     if (!firm) {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Firm not found with the provided ID",
       });
@@ -133,7 +185,7 @@ const get_firm_by_id = async (req, res) => {
       data: firm,
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
       message: `Failed to fetch firm: ${error.message}`,
     });
@@ -158,7 +210,7 @@ const delete_firm = async (req, res) => {
       message: "Firm deleted successfully",
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
       message: `Failed to delete firm: ${error.message}`,
     });
@@ -175,7 +227,7 @@ const get_all_firm = async (req, res) => {
       data: firms,
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
       message: `Failed to fetch firms: ${error.message}`,
     });
