@@ -28,7 +28,32 @@ const saveFiles = async (file, ownerId, uniqueName) => {
 
   return 'File Save Successfully';
 };
+const deleteFile = async (uniqueName,ownerId) => {
+  if (!ownerId || !uniqueName) {
+    throw new Error('ownerId and uniqueName are required');
+  }
 
+  const uploadDir = path.join(__dirname, '..', 'public', 'images', String(ownerId));
+  try {
+    const files = await fs.readdir(uploadDir);
+    console.log(files);
+    const targetFile = files.find(file => path.parse(file).name === uniqueName);
+
+    if (!targetFile) {
+      return 'File not found';
+    }
+
+    const filePath = path.join(uploadDir, targetFile);
+    await fs.unlink(filePath);
+    return 'File deleted successfully';
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error('Directory not found');
+    }
+    throw err;
+  }
+};
 module.exports = {
   saveFiles,
+  deleteFile
 };

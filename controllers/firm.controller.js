@@ -1,9 +1,7 @@
 const firmService = require("../services/firm.service");
 const { createFirmSchema, updateFirmSchema } = require("../validation/firm_validation");
 const { getOwnerIdFromToken } = require("../utils/tokenHelper");
-const { add_new_image } = require("../services/image.service");
-const { saveFiles } = require("../services/file.service");
-
+const { add_new_image, delete_image } = require("../services/image.service");
 const create_firm = async (req, res) => {
   try {
     const ownerId = await getOwnerIdFromToken(req);
@@ -40,7 +38,7 @@ const create_firm = async (req, res) => {
       };
     }
     // Insert image references (if any)
-    const insertedImages = await add_new_image(imageData);
+    const insertedImages = await add_new_image(imageData,req.files,ownerId);
 
     // Attach new image IDs to req.body for file saving
     req.body = {
@@ -56,19 +54,6 @@ const create_firm = async (req, res) => {
         success: false,
         message: savedFirm.message,
       });
-    }
-
-    // Save uploaded image files (if present)
-    if (req.files) {
-      if (req.files.left_logo_file) {
-        await saveFiles(req.files.left_logo_file, ownerId, insertedImages.firm_left_logo_id);
-      }
-      if (req.files.right_logo_file) {
-        await saveFiles(req.files.right_logo_file, ownerId, insertedImages.firm_right_logo_id);
-      }
-      if (req.files.qr_code_file) {
-        await saveFiles(req.files.qr_code_file, ownerId, insertedImages.firm_qr_code_id);
-      }
     }
 
     return res.status(200).json({
@@ -99,7 +84,7 @@ const update_firm = async (req, res) => {
         message: error.details.map((err) => err.message).join(", "),
       });
     }
-
+     const orignalData=await firmService.get_firm_by_id(id);
     // Prepare image data if logos/QR provided
     const imageData = {};
     if (req.body.firm_left_logo_id) {
@@ -107,22 +92,25 @@ const update_firm = async (req, res) => {
         img_own_id: ownerId,
         img_name: req.body.firm_left_logo_id,
       };
+      delete_image(orignalData.firm_left_logo_id,ownerId);
     }
     if (req.body.firm_right_logo_id) {
       imageData.firm_right_logo_id = {
         img_own_id: ownerId,
         img_name: req.body.firm_right_logo_id,
       };
+      delete_image(orignalData.firm_right_logo_id,ownerId);
     }
     if (req.body.firm_qr_code_id) {
       imageData.firm_qr_code_id = {
         img_own_id: ownerId,
         img_name: req.body.firm_qr_code_id,
       };
+      delete_image(orignalData.firm_qr_code_id,ownerId);
     }
 
     // Insert image references (if any)
-    const insertedImages = await add_new_image(imageData);
+        const insertedImages = await add_new_image(imageData,req.files,ownerId);
 
     // Attach new image IDs to req.body for file saving
     req.body = {
@@ -138,19 +126,6 @@ const update_firm = async (req, res) => {
         success: false,
         message: "Firm not found with the provided ID",
       });
-    }
-
-    // Save uploaded image files (if present)
-    if (req.files) {
-      if (req.files.left_logo_file) {
-        await saveFiles(req.files.left_logo_file, ownerId, insertedImages.firm_left_logo_id || updatedFirm.firm_left_logo_id);
-      }
-      if (req.files.right_logo_file) {
-        await saveFiles(req.files.right_logo_file, ownerId, insertedImages.firm_right_logo_id || updatedFirm.firm_right_logo_id);
-      }
-      if (req.files.qr_code_file) {
-        await saveFiles(req.files.qr_code_file, ownerId, insertedImages.firm_qr_code_id || updatedFirm.firm_qr_code_id);
-      }
     }
 
     return res.status(200).json({

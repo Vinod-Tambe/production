@@ -1,9 +1,10 @@
 const Image = require('../models/image.model');
 const path = require("path");
 const fs = require("fs");
+const { saveFiles, deleteFile } = require("../services/file.service");
 
 // Add a new image
-const add_new_image = async (imagesObj) => {
+const add_new_image = async (imagesObj, reqFiles, ownerId) => {
   if (typeof imagesObj !== 'object' || Array.isArray(imagesObj)) {
     throw new Error('Input must be an object with image entries');
   }
@@ -25,6 +26,18 @@ const add_new_image = async (imagesObj) => {
     const image = new Image(imageData);
     const saved = await image.save();  // plugin works here, img_id should be set
     result[key] = saved.img_id;
+  }
+  // Save uploaded image files (if present)
+  if (reqFiles) {
+    if (reqFiles.left_logo_file) {
+      await saveFiles(reqFiles.left_logo_file, ownerId, result.firm_left_logo_id);
+    }
+    if (reqFiles.right_logo_file) {
+      await saveFiles(reqFiles.right_logo_file, ownerId, result.firm_right_logo_id);
+    }
+    if (reqFiles.qr_code_file) {
+      await saveFiles(reqFiles.qr_code_file, ownerId, result.firm_qr_code_id);
+    }
   }
 
   return result;
@@ -91,7 +104,8 @@ const update_image = async (updateObj) => {
 
 
 // Delete an image by img_id
-const delete_image = async (img_id) => {
+const delete_image = async (img_id,own_id) => {
+  deleteFile(img_id,own_id);
   return await Image.findOneAndDelete({ img_id });
 };
 

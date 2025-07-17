@@ -110,7 +110,7 @@ const createFirmSchema = Joi.object({
 });
 
 const updateFirmSchema = Joi.object({
-    firm_name: Joi.string().trim().required().messages({
+  firm_name: Joi.string().trim().required().messages({
     "string.base": "Firm name must be a string",
     "string.empty": "Firm name is required",
     "any.required": "Firm name is required",
@@ -138,7 +138,7 @@ const updateFirmSchema = Joi.object({
     "string.base": "City must be a string",
   }),
 
-  firm_pincode: Joi.string().pattern(/^[0-9]{6}$/).messages({
+  firm_pincode: Joi.string().allow("").pattern(/^[0-9]{6}$/).messages({
     "string.pattern.base": "Pincode must be a 6-digit number",
   }),
 
@@ -187,7 +187,7 @@ const updateFirmSchema = Joi.object({
   firm_acc_holder: Joi.string().allow(""),
   firm_acc_type: Joi.string().allow(""),
 
-  firm_ifsc_code: Joi.string().pattern(/^[A-Z]{4}0[A-Z0-9]{6}$/).messages({
+  firm_ifsc_code: Joi.string().allow("").pattern(/^[A-Z]{4}0[A-Z0-9]{6}$/).messages({
     "string.pattern.base": "IFSC Code must follow standard format like ABCD0EFG123",
   }),
 
@@ -202,11 +202,11 @@ const updateFirmSchema = Joi.object({
     "any.only": "Balance type must be either DR or CR",
   }),
 
-  firm_gstin_no: Joi.string().pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).messages({
+  firm_gstin_no: Joi.string().allow("").pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).messages({
     "string.pattern.base": "GSTIN must be a valid GST number",
   }),
 
-  firm_pan_no: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).messages({
+  firm_pan_no: Joi.string().allow("").pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).messages({
     "string.pattern.base": "PAN number must be valid (e.g., ABCDE1234F)",
   }),
 
@@ -216,7 +216,8 @@ const updateFirmSchema = Joi.object({
   firm_left_logo_id: Joi.string().allow(""),
   firm_right_logo_id: Joi.string().allow(""),
   firm_qr_code_id: Joi.string().allow(""),
-});
+}).unknown(true); // 👈 allows extra fields
+
 
 module.exports = {
   createFirmSchema,updateFirmSchema
