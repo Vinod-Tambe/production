@@ -36,7 +36,7 @@ const deleteFile = async (uniqueName,ownerId) => {
   const uploadDir = path.join(__dirname, '..', 'public', 'images', String(ownerId));
   try {
     const files = await fs.readdir(uploadDir);
-    console.log(files);
+    // console.log(files);
     const targetFile = files.find(file => path.parse(file).name === uniqueName);
 
     if (!targetFile) {

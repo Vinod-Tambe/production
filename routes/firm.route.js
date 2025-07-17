@@ -9,6 +9,7 @@ const uploadFields = upload.fields([
     { name: "right_logo_file", maxCount: 1 },
     { name: "left_logo_file", maxCount: 1 },
     { name: "qr_code_file", maxCount: 1 },
+    { name: "firm_own_sign_file", maxCount: 1 },
 ]);
 
 // Create firm with authentication and file upload handling
