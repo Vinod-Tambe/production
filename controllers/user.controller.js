@@ -3,30 +3,98 @@ const { userValidationSchema } = require('../validation/user.validation');
 const {
   generateToken
 } = require('../utils/jwtProvider');
-
+const { saveFiles } = require("../services/file.service");
+const { getOwnerIdFromToken } = require('../utils/tokenHelper');
+const { add_new_image } = require('../services/image.service');
 // =============================
 // 🧑 CREATE USER
 // =============================
 const create_user = async (req, res) => {
   try {
+    const ownerId = await getOwnerIdFromToken(req);
+     req.body.user_own_id = ownerId;
     const { error } = userValidationSchema.validate(req.body);
     if (error) {
-      return res.status(400).json({ success: false, message: `Validation Error: ${error.details[0].message}` });
+      return res.status(200).json({ success: false, message: error.details[0].message });
     }
+    
+     const imageData = {};
+        if (req.body.user_sign) {
+            imageData.user_sign = {
+            img_own_id: ownerId,
+            img_name: req.body.user_sign,
+          };
+        }
+        if (req.body.user_img_id) {
+          imageData.user_img_id = {
+            img_own_id: ownerId,
+            img_name: req.body.user_img_id,
+          };
+        }
+        if (req.body.user_pan_img_id) {
+          imageData.user_pan_img_id = {
+            img_own_id: ownerId,
+            img_name: req.body.user_pan_img_id,
+          };
+        }
+        if (req.body.user_adhaar_front_img_id) {
+          imageData.user_adhaar_front_img_id = {
+            img_own_id: ownerId,
+            img_name: req.body.user_adhaar_front_img_id,
+          };
+        }
+        if (req.body.user_adhaar_back_img_id) {
+          imageData.user_adhaar_back_img_id = {
+            img_own_id: ownerId,
+            img_name: req.body.user_adhaar_back_img_id,
+          };
+        }
+        // console.log(imageData);
+        // Insert image references (if any)
+        const insertedImages = await add_new_image(imageData);
+    
+        // Attach new image IDs to req.body for file saving
+        req.body = {
+          ...req.body,
+          ...insertedImages,
+        };
 
     const user = await userService.create_user(req.body);
-
+        if (!user.success) {
+      return res.status(400).json({
+        success: false,
+        message: user.message,
+      });
+    }
+    // Save uploaded image files (if present)
+    if (req.files) {
+      if (req.files.user_img_file) {
+        await saveFiles(req.files.user_img_file, ownerId, insertedImages.user_img_id);
+      }
+      if (req.files.user_adhaar_front_file) {
+        await saveFiles(req.files.user_adhaar_front_file, ownerId, insertedImages.user_adhaar_front_img_id);
+      }
+      if (req.files.user_adhaar_back_file) {
+        await saveFiles(req.files.user_adhaar_back_file, ownerId, insertedImages.user_adhaar_back_img_id);
+      }
+      if (req.files.user_pan_file) {
+        await saveFiles(req.files.user_pan_file, ownerId, insertedImages.user_pan_img_id);
+      }
+      if (req.files.user_sign_file) {
+        await saveFiles(req.files.user_sign_file, ownerId, insertedImages.user_sign);
+      }
+    }
     // 🔐 Generate token
     const token = generateToken(user._id);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: 'User created successfully',
+      message: 'User added successfully',
       data: user,
       token
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: `Error creating user: ${err.message}` });
+    res.status(200).json({ success: false, message: err.message });
   }
 };
 

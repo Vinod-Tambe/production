@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 const userSchema = new mongoose.Schema({
-  user_id: { type: String, required: true, unique: true, trim: true, default: "" },
+  user_id: { type: Number, unique: true, trim: true, default: "" },
   user_add_date: { type: Date, default: Date.now },
   user_firm_id: { type: String, required: true, trim: true, default: "" },
-  user_own_id: { type: String, required: true, trim: true, default: "" },
+  user_own_id: { type: Number, required: true, trim: true, default: 0 },
   user_name_prefix: {
     type: String,
     enum: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Er.'],
@@ -12,20 +12,19 @@ const userSchema = new mongoose.Schema({
   },
   user_first_name: { type: String, required: true, trim: true, default: "" },
   user_middle_name: { type: String, trim: true, default: "" },
-  user_last_name: { type: String, required: true, trim: true, default: "" },
-  user_email: { type: String, required: true, unique: true, trim: true, default: "" },
+  user_last_name: { type: String, trim: true, default: "" },
+  user_email: { type: String,unique: true, trim: true, default: "" },
 
   user_phone: { type: String, unique: true, match: /^[0-9]{10}$/, trim: true, default: "" },
   user_mobile: { type: String, unique: true, match: /^[0-9]{10}$/, trim: true, default: "" },
 
   user_type: {
     type: String,
-    enum: ['Admin', 'Employee', 'Owner', 'Other'],
-    required: true,
-    default: 'Other',
+    enum: ['Customer', 'Staff'],
+    default: 'Customer',
   },
-  user_pre_id: { type: String, trim: true, default: "" },
-  user_post_id: { type: String, trim: true, required: true, unique: true, default: "" },
+  user_pre_id: { type: String, trim: true, default: "C" },
+  user_post_id: { type: Number, trim: true, unique: true },
 
   user_mother_name: { type: String, trim: true, default: "" },
   user_gender: {
@@ -109,5 +108,8 @@ const userSchema = new mongoose.Schema({
   user_adhaar_front_img_id: { type: String, default: "" },
   user_adhaar_back_img_id: { type: String, default: "" },
 });
+userSchema.plugin(AutoIncrement, { inc_field: 'user_id' });
+userSchema.plugin(AutoIncrement, { inc_field: 'user_post_id' });
+
 
 module.exports = mongoose.model("User", userSchema);

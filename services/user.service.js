@@ -4,35 +4,43 @@ const User = require('../models/user.model');
 // 🧑 CREATE NEW USER
 // =====================================
 const create_user = async (userData) => {
-  const { user_mobile, user_phone, user_email, user_pre_id, user_post_id } = userData;
+  const {
+    user_mobile = '',
+    user_phone = '',
+    user_email = '',
+    user_first_name = '',
+    user_adhaar_no = '',
+  } = userData;
 
-  // Check for duplicate user_mobile
-  const existingMobile = await User.findOne({ user_mobile });
-  if (existingMobile) {
-    throw new Error('Mobile number already exists');
-  }
+  // Trim all fields for consistency
+  const trimmedFirstName = user_first_name.trim();
+  const trimmedLastName = user_last_name.trim();
+  const trimmedMiddleName = user_middle_name.trim();
+  const trimmedMobile = user_mobile.trim();
+  const trimmedPhone = user_phone.trim();
+  const trimmedEmail = user_email.trim();
+  const trimmedAdhaar = user_adhaar_no.trim();
 
-  // Check for duplicate user_phone
-  const existingPhone = await User.findOne({ user_phone });
-  if (existingPhone) {
-    throw new Error('Phone number already exists');
-  }
+  // Check if a user with all these fields the same already exists
+  const existingUser = await User.findOne({
+    user_first_name: trimmedFirstName,
+    user_mobile: trimmedMobile,
+    user_phone: trimmedPhone,
+    user_email: trimmedEmail,
+    user_adhaar_no: trimmedAdhaar,
+    user_middle_name: trimmedMiddleName,
+    user_last_name: trimmedLastName,
+  });
 
-  // Check for duplicate user_email
-  const existingEmail = await User.findOne({ user_email });
-  if (existingEmail) {
-    throw new Error('Email already exists');
-  }
-
-  // Check if user_pre_id and user_post_id are the same
-  if (user_pre_id === user_post_id) {
-    throw new Error('Prefix ID and Postfix ID cannot be the same');
+  if (existingUser) {
+    throw new Error('User with the same name, contact details, and Aadhaar number already exist');
   }
 
   // All validations passed, create user
   const user = new User(userData);
   return await user.save();
 };
+
 // =====================================
 // ✏️ UPDATE USER BY ID
 // =====================================
