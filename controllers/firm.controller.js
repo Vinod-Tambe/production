@@ -245,7 +245,8 @@ const delete_firm = async (req, res) => {
 // Get all firms
 const get_all_firm = async (req, res) => {
   try {
-    const firms = await firmService.get_all_firm(req.body);
+    // Use req.query instead of req.body for GET requests
+    const firms = await firmService.get_all_firm(req.query);
     return res.status(200).json({
       success: true,
       message: "Firms fetched successfully",
@@ -258,6 +259,7 @@ const get_all_firm = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   create_firm,
