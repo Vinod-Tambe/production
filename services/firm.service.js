@@ -67,10 +67,20 @@ const delete_firm = async (id) => {
   return await Firm.findByIdAndDelete(id);
 };
 
-// Get all firms
-const get_all_firm = async () => {
-  return await Firm.find().sort({ firm_add_date: -1 });
+const get_all_firm = async (fields) => {
+  fields=fields.field;
+  if (!Array.isArray(fields) || fields.length === 0) {
+    return await Firm.find().sort({ firm_add_date: -1 });
+  }
+
+  const selectFields = fields.join(' ');
+
+  return await Firm.find()
+    .select(selectFields)
+    .sort({ firm_add_date: -1 });
 };
+
+
 
 module.exports = {
   create_firm,
