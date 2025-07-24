@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   user_id: { type: Number, unique: true, trim: true, default: "" },
   user_add_date: { type: Date, default: Date.now },
   user_firm_id: { type: String, required: true, trim: true, default: "" },
+  user_acc_id: { type: String, required: true, trim: true, default: "" },
   user_own_id: { type: Number, required: true, trim: true, default: 0 },
   user_name_prefix: {
     type: String,
@@ -11,6 +12,11 @@ const userSchema = new mongoose.Schema({
     default: 'Mr.',
   },
   user_first_name: { type: String, required: true, trim: true, default: "" },
+  user_father_prefix:  {
+    type: String,
+    enum: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Er.'],
+    default: 'Mr.',
+  },
   user_middle_name: { type: String, trim: true, default: "" },
   user_last_name: { type: String, trim: true, default: "" },
   user_email: { type: String,unique: true, trim: true, default: "" },
@@ -82,7 +88,7 @@ const userSchema = new mongoose.Schema({
   user_other_upi: { type: String, trim: true, default: "" },
   user_payment_mode: {
     type: String,
-    enum: ['Cash', 'Bank Transfer', 'UPI', 'Cheque'],
+    enum: ['PhonePay', 'RazorPay'],
     trim: true,
     default: 'Cash',
   },
@@ -113,3 +119,5 @@ userSchema.plugin(AutoIncrement, { inc_field: 'user_post_id' });
 
 
 module.exports = mongoose.model("User", userSchema);
+
+//user_father_prefix, user_acc_id
