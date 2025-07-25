@@ -5,11 +5,11 @@ const upload = require("../middleware/multer.authenticate");
 const ownerAuthenticate = require("../middleware/owner.authenticate");
 // Define multer upload fields matching frontend file input names
 const uploadFields = upload.fields([
-    { name: "user_img_file", maxCount: 1 },
-    { name: "user_adhaar_front_file", maxCount: 1 },
-    { name: "user_adhaar_back_file", maxCount: 1 },
-    { name: "user_pan_file", maxCount: 1 },
-    { name: "user_sign_file", maxCount: 1 },
+    { name: "user_sign", maxCount: 1 },
+    { name: "user_img_id", maxCount: 1 },
+    { name: "user_pan_img_id", maxCount: 1 },
+    { name: "user_adhaar_front_img_id", maxCount: 1 },
+    { name: "user_adhaar_back_img_id", maxCount: 1 },
 ]);
 // ==============================
 // 🧑 CREATE NEW USER

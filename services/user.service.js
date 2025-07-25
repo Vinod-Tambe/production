@@ -36,7 +36,7 @@ const create_user = async (userData) => {
   });
 
   if (existingUser) {
-    throw new Error('User with the same name, contact details, and Aadhaar number already exist');
+    throw new Error('User already exists — please change at least one: name, contact, or Aadhaar.');
   }
 
   // All validations passed, create user

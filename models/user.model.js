@@ -19,10 +19,10 @@ const userSchema = new mongoose.Schema({
   },
   user_middle_name: { type: String, trim: true, default: "" },
   user_last_name: { type: String, trim: true, default: "" },
-  user_email: { type: String,unique: true, trim: true, default: "" },
+  user_email: { type: String, trim: true, default: "" },
 
-  user_phone: { type: String, unique: true, match: /^[0-9]{10}$/, trim: true, default: "" },
-  user_mobile: { type: String, unique: true, match: /^[0-9]{10}$/, trim: true, default: "" },
+  user_phone: { type: String, match: /^[0-9]{10}$/, trim: true, default: "" },
+  user_mobile: { type: String, match: /^[0-9]{10}$/, trim: true, default: "" },
 
   user_type: {
     type: String,
@@ -120,4 +120,3 @@ userSchema.plugin(AutoIncrement, { inc_field: 'user_post_id' });
 
 module.exports = mongoose.model("User", userSchema);
 
-//user_father_prefix, user_acc_id
