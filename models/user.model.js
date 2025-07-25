@@ -3,8 +3,8 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const userSchema = new mongoose.Schema({
   user_id: { type: Number, unique: true, trim: true, default: "" },
   user_add_date: { type: Date, default: Date.now },
-  user_firm_id: { type: String, required: true, trim: true, default: "" },
-  user_acc_id: { type: String, required: true, trim: true, default: "" },
+  user_firm_id: { type: Number, required: true, trim: true, default: "" },
+  user_acc_id: { type: Number, required: true, trim: true, default: "" },
   user_own_id: { type: Number, required: true, trim: true, default: 0 },
   user_name_prefix: {
     type: String,
@@ -90,7 +90,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['PhonePay', 'RazorPay'],
     trim: true,
-    default: 'Cash',
+    default: 'PhonePay',
   },
 
   user_shop_name: { type: String, trim: true, default: "" },

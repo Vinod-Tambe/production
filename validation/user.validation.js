@@ -1,14 +1,9 @@
 const Joi = require('joi');
 
 const userValidationSchema = Joi.object({
-  user_id:  Joi.string().allow('').optional(),
-
-  user_firm_id: Joi.string().required().messages({
-    'string.empty': 'Firm ID is required',
+  user_firm_id: Joi.required().messages({
+    'firm':'Please Select Firm',
   }),
-
-  user_own_id: Joi.string().allow('').optional(),
-
   user_name_prefix: Joi.string().valid('Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Er.').default('Mr.').messages({
     'any.only': 'Name prefix must be one of Mr., Mrs., Ms., Dr., Er.'
   }),
@@ -33,7 +28,7 @@ const userValidationSchema = Joi.object({
     'string.pattern.base': 'Mobile number must be a 10-digit number',
   }),
 
-  user_type: Joi.string().valid('Customer', 'Staff').default('Customer').required().messages({
+  user_type: Joi.string().default('Customer').required().messages({
     'any.only': 'User type must be Customer or Staff',
     'string.empty': 'User type is required'
   }),
@@ -101,7 +96,7 @@ const userValidationSchema = Joi.object({
 
   user_other_upi: Joi.string().allow('').optional(),
 
-  user_payment_mode: Joi.string().valid('Cash', 'Bank Transfer', 'UPI', 'Cheque').default('Cash'),
+  user_payment_mode: Joi.string().valid('PhonePay', 'RazorPay').default('PhonePay'),
 
   user_shop_name: Joi.string().allow('').optional(),
 
@@ -134,7 +129,7 @@ const userValidationSchema = Joi.object({
   user_pan_img_id: Joi.string().allow('').optional(),
   user_adhaar_front_img_id: Joi.string().allow('').optional(),
   user_adhaar_back_img_id: Joi.string().allow('').optional()
-});
+}).unknown(true);
 
 module.exports = {
   userValidationSchema

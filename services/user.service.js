@@ -4,11 +4,14 @@ const User = require('../models/user.model');
 // 🧑 CREATE NEW USER
 // =====================================
 const create_user = async (userData) => {
+    try {
   const {
     user_mobile = '',
     user_phone = '',
     user_email = '',
     user_first_name = '',
+    user_middle_name = '',
+    user_last_name = '',
     user_adhaar_no = '',
   } = userData;
 
@@ -38,7 +41,11 @@ const create_user = async (userData) => {
 
   // All validations passed, create user
   const user = new User(userData);
-  return await user.save();
+  const savedUser = await user.save();
+    return { success: true, data: savedUser };
+     } catch (err) {
+    return { success: false, message: err.message };
+  }
 };
 
 // =====================================
