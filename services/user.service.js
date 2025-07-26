@@ -68,7 +68,8 @@ const delete_user = async (userId) => {
 // 📋 GET ALL USERS
 // =====================================
 const get_all_user = async (filter = {}, projection = null, options = {}) => {
-  return await User.find(filter, projection, options);
+  return await User.find(filter, projection, options)
+                   .sort({ user_add_date: -1 }); // descending by user_add_date
 };
 
 // =====================================
