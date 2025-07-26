@@ -12,52 +12,52 @@ const { add_new_image } = require('../services/image.service');
 const create_user = async (req, res) => {
   try {
     const ownerId = await getOwnerIdFromToken(req);
-     req.body.user_own_id = ownerId;
+    req.body.user_own_id = ownerId;
     const { error } = userValidationSchema.validate(req.body);
     if (error) {
       return res.status(200).json({ success: false, message: error.details[0].message });
     }
-     const imageData = {};
-        if (req.files.user_sign) {
-            imageData.user_sign = {
-            img_own_id: ownerId,
-            img_name: req.files.user_sign[0].originalname,
-          };
-        }
-        if (req.files.user_img_id) {
-          imageData.user_img_id = {
-            img_own_id: ownerId,
-            img_name: req.files.user_img_id[0].originalname,
-          };
-        }
-        if (req.files.user_pan_img_id) {
-          imageData.user_pan_img_id = {
-            img_own_id: ownerId,
-            img_name: req.files.user_pan_img_id[0].originalname,
-          };
-        }
-        if (req.files.user_adhaar_front_img_id) {
-          imageData.user_adhaar_front_img_id = {
-            img_own_id: ownerId,
-            img_name: req.files.user_adhaar_front_img_id[0].originalname,
-          };
-        }
-        if (req.files.user_adhaar_back_img_id) {
-          imageData.user_adhaar_back_img_id = {
-            img_own_id: ownerId,
-            img_name: req.files.user_adhaar_back_img_id[0].originalname,
-          };
-        }
-        // Insert image references (if any)
-        const insertedImages = await add_new_image(imageData);
-        // Attach new image IDs to req.body for file saving
-        req.body = {
-          ...req.body,
-          ...insertedImages,
-        };
+    const imageData = {};
+    if (req.files.user_sign) {
+      imageData.user_sign = {
+        img_own_id: ownerId,
+        img_name: req.files.user_sign[0].originalname,
+      };
+    }
+    if (req.files.user_img_id) {
+      imageData.user_img_id = {
+        img_own_id: ownerId,
+        img_name: req.files.user_img_id[0].originalname,
+      };
+    }
+    if (req.files.user_pan_img_id) {
+      imageData.user_pan_img_id = {
+        img_own_id: ownerId,
+        img_name: req.files.user_pan_img_id[0].originalname,
+      };
+    }
+    if (req.files.user_adhaar_front_img_id) {
+      imageData.user_adhaar_front_img_id = {
+        img_own_id: ownerId,
+        img_name: req.files.user_adhaar_front_img_id[0].originalname,
+      };
+    }
+    if (req.files.user_adhaar_back_img_id) {
+      imageData.user_adhaar_back_img_id = {
+        img_own_id: ownerId,
+        img_name: req.files.user_adhaar_back_img_id[0].originalname,
+      };
+    }
+    // Insert image references (if any)
+    const insertedImages = await add_new_image(imageData);
+    // Attach new image IDs to req.body for file saving
+    req.body = {
+      ...req.body,
+      ...insertedImages,
+    };
 
     const user = await userService.create_user(req.body);
-        if (!user.success) {
+    if (!user.success) {
       return res.status(200).json({
         success: false,
         message: user.message,

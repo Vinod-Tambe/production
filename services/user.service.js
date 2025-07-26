@@ -34,7 +34,6 @@ const create_user = async (userData) => {
     user_middle_name: trimmedMiddleName,
     user_last_name: trimmedLastName,
   });
-
   if (existingUser) {
     throw new Error('User already exists — please change at least one: name, contact, or Aadhaar.');
   }
