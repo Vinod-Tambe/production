@@ -131,7 +131,7 @@ const update_user = async (req, res) => {
           img_name: req.files.user_img_id[0].originalname,
         };
           if (orignalData.user_img_id != '' && orignalData.user_img_id != null) {
-        delete_image(orignalData.user_img_id, ownerId);
+            delete_image(orignalData.user_img_id, ownerId);
       }
       }
       if (req.files.user_pan_img_id) {
@@ -165,13 +165,11 @@ const update_user = async (req, res) => {
 
     // Insert image metadata and get references
     const insertedImages = await add_new_image(imageData);
-
     // Merge image IDs into request body
     req.body = {
       ...req.body,
       ...insertedImages,
     };
-
     // Update user in DB
     const updatedUser = await userService.update_user(userId, req.body);
     if (!updatedUser.success) {
