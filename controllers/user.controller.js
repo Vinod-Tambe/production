@@ -5,7 +5,7 @@ const {
 } = require('../utils/jwtProvider');
 const { saveFiles } = require("../services/file.service");
 const { getOwnerIdFromToken } = require('../utils/tokenHelper');
-const { add_new_image } = require('../services/image.service');
+const { add_new_image, delete_image } = require('../services/image.service');
 // =============================
 // 🧑 CREATE USER
 // =============================
@@ -18,6 +18,8 @@ const create_user = async (req, res) => {
       return res.status(200).json({ success: false, message: error.details[0].message });
     }
     const imageData = {};
+    if(req.files)
+    {
     if (req.files.user_sign) {
       imageData.user_sign = {
         img_own_id: ownerId,
@@ -48,6 +50,7 @@ const create_user = async (req, res) => {
         img_name: req.files.user_adhaar_back_img_id[0].originalname,
       };
     }
+  }
     // Insert image references (if any)
     const insertedImages = await add_new_image(imageData);
     // Attach new image IDs to req.body for file saving
@@ -100,21 +103,113 @@ const create_user = async (req, res) => {
 // =============================
 const update_user = async (req, res) => {
   try {
+    const ownerId = await getOwnerIdFromToken(req);
+    req.body.user_own_id = ownerId;
+
     const { error } = userValidationSchema.validate(req.body);
     if (error) {
-      return res.status(400).json({ success: false, message: `Validation Error: ${error.details[0].message}` });
+      return res.status(200).json({ success: false, message: error.details[0].message });
     }
 
-    const user = await userService.update_user(req.params.id, req.body);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    const userId = req.params.id;
+    const imageData = {};
+    const orignalData = await userService.get_user_details(userId);
+    // Prepare image metadata if files are uploaded
+    if (req.files) {
+      if (req.files.user_sign) {
+        imageData.user_sign = {
+          img_own_id: ownerId,
+          img_name: req.files.user_sign[0].originalname,
+        };
+         if (orignalData.user_sign != '' && orignalData.user_sign != null) {
+        delete_image(orignalData.user_sign, ownerId);
+      }
+      }
+      if (req.files.user_img_id) {
+        imageData.user_img_id = {
+          img_own_id: ownerId,
+          img_name: req.files.user_img_id[0].originalname,
+        };
+          if (orignalData.user_img_id != '' && orignalData.user_img_id != null) {
+        delete_image(orignalData.user_img_id, ownerId);
+      }
+      }
+      if (req.files.user_pan_img_id) {
+        imageData.user_pan_img_id = {
+          img_own_id: ownerId,
+          img_name: req.files.user_pan_img_id[0].originalname,
+        };
+            if (orignalData.user_pan_img_id != '' && orignalData.user_pan_img_id != null) {
+        delete_image(orignalData.user_pan_img_id, ownerId);
+      }
+      }
+      if (req.files.user_adhaar_front_img_id) {
+        imageData.user_adhaar_front_img_id = {
+          img_own_id: ownerId,
+          img_name: req.files.user_adhaar_front_img_id[0].originalname,
+        };
+             if (orignalData.user_adhaar_front_img_id != '' && orignalData.user_adhaar_front_img_id != null) {
+        delete_image(orignalData.user_adhaar_front_img_id, ownerId);
+      }
+      }
+      if (req.files.user_adhaar_back_img_id) {
+        imageData.user_adhaar_back_img_id = {
+          img_own_id: ownerId,
+          img_name: req.files.user_adhaar_back_img_id[0].originalname,
+        };
+            if (orignalData.user_adhaar_back_img_id != '' && orignalData.user_adhaar_back_img_id != null) {
+        delete_image(orignalData.user_adhaar_back_img_id, ownerId);
+      }
+      }
     }
 
-    res.json({ success: true, message: 'User updated successfully', data: user });
+    // Insert image metadata and get references
+    const insertedImages = await add_new_image(imageData);
+
+    // Merge image IDs into request body
+    req.body = {
+      ...req.body,
+      ...insertedImages,
+    };
+
+    // Update user in DB
+    const updatedUser = await userService.update_user(userId, req.body);
+    if (!updatedUser.success) {
+      return res.status(200).json({
+        success: false,
+        message: updatedUser.message,
+      });
+    }
+
+    // Save uploaded image files (if present)
+    if (req.files) {
+      if (req.files.user_sign) {
+        await saveFiles(req.files.user_sign, ownerId, insertedImages.user_sign);
+      }
+      if (req.files.user_adhaar_back_img_id) {
+        await saveFiles(req.files.user_adhaar_back_img_id, ownerId, insertedImages.user_adhaar_back_img_id);
+      }
+      if (req.files.user_adhaar_front_img_id) {
+        await saveFiles(req.files.user_adhaar_front_img_id, ownerId, insertedImages.user_adhaar_front_img_id);
+      }
+      if (req.files.user_pan_img_id) {
+        await saveFiles(req.files.user_pan_img_id, ownerId, insertedImages.user_pan_img_id);
+      }
+      if (req.files.user_img_id) {
+        await saveFiles(req.files.user_img_id, ownerId, insertedImages.user_img_id);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      data: updatedUser.data,
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: `Error updating user: ${err.message}` });
+    res.status(200).json({ success: false, message: err.message });
   }
 };
+
 
 // =============================
 // ❌ DELETE USER

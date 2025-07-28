@@ -63,7 +63,6 @@ const userSchema = new mongoose.Schema({
   user_adhaar_no: {
     type: String,
     match: /^[0-9]{12}$/,
-    unique: true,
     default: "",
   },
 

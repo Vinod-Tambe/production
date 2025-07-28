@@ -51,11 +51,68 @@ const create_user = async (userData) => {
 // ✏️ UPDATE USER BY ID
 // =====================================
 const update_user = async (userId, updatedData) => {
-  return await User.findByIdAndUpdate(userId, updatedData, {
-    new: true,
-    runValidators: true
-  });
+  try {
+    // Destructure and trim the fields
+    const {
+      user_mobile = '',
+      user_phone = '',
+      user_email = '',
+      user_first_name = '',
+      user_middle_name = '',
+      user_last_name = '',
+      user_adhaar_no = '',
+    } = updatedData;
+
+    const trimmedFirstName = user_first_name.trim();
+    const trimmedLastName = user_last_name.trim();
+    const trimmedMiddleName = user_middle_name.trim();
+    const trimmedMobile = user_mobile.trim();
+    const trimmedPhone = user_phone.trim();
+    const trimmedEmail = user_email.trim();
+    const trimmedAdhaar = user_adhaar_no.trim();
+
+    // Check if another user (not this one) has same data
+    const duplicateUser = await User.findOne({
+      _id: { $ne: userId }, // not the current user
+      user_first_name: trimmedFirstName,
+      user_middle_name: trimmedMiddleName,
+      user_last_name: trimmedLastName,
+      user_mobile: trimmedMobile,
+      user_phone: trimmedPhone,
+      user_email: trimmedEmail,
+      user_adhaar_no: trimmedAdhaar,
+    });
+
+    if (duplicateUser) {
+      throw new Error('Another user already exists with the same name, contact, or Aadhaar.');
+    }
+
+    // Prepare trimmed update object
+    const cleanedData = {
+      user_first_name: trimmedFirstName,
+      user_middle_name: trimmedMiddleName,
+      user_last_name: trimmedLastName,
+      user_mobile: trimmedMobile,
+      user_phone: trimmedPhone,
+      user_email: trimmedEmail,
+      user_adhaar_no: trimmedAdhaar,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, cleanedData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedUser) {
+      throw new Error('User not found.');
+    }
+
+    return { success: true, data: updatedUser };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
 };
+
 
 // =====================================
 // ❌ DELETE USER BY ID
