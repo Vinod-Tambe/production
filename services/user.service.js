@@ -86,19 +86,7 @@ const update_user = async (userId, updatedData) => {
     if (duplicateUser) {
       throw new Error('Another user already exists with the same name, contact, or Aadhaar.');
     }
-
-    // Prepare trimmed update object
-    const cleanedData = {
-      user_first_name: trimmedFirstName,
-      user_middle_name: trimmedMiddleName,
-      user_last_name: trimmedLastName,
-      user_mobile: trimmedMobile,
-      user_phone: trimmedPhone,
-      user_email: trimmedEmail,
-      user_adhaar_no: trimmedAdhaar,
-    };
-
-    const updatedUser = await User.findByIdAndUpdate(userId, cleanedData, {
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
       new: true,
       runValidators: true,
     });
