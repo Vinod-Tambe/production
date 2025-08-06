@@ -18,7 +18,6 @@ const accountSchema = new mongoose.Schema({
   },
   acc_pan_no: {
     type: String,
-    required: true,
     uppercase: true,
     match: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
     default: "",
@@ -39,7 +38,6 @@ const accountSchema = new mongoose.Schema({
   },
   acc_bank_no: {
     type: String,
-    required: true,
     default: "",
   },
   acc_bsr_no: {
@@ -86,9 +84,9 @@ const accountSchema = new mongoose.Schema({
   },
   acc_balance_type: {
     type: String,
-    enum: ["credit", "debit"],
+    enum: ["CR", "DR"],
     required: true,
-    default: "debit",
+    default: "DR",
   },
   acc_other_info: {
     type: String,
