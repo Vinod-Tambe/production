@@ -44,5 +44,8 @@ app.use("/account", accountRouters);
 const imageRouters = require("./routes/image.route.js");
 app.use("/image", imageRouters);
 
+const financeRouters = require("./routes/finance.route.js");
+app.use("/finance", financeRouters);
+
 // ✅ Export only once at the end
 module.exports = app;
