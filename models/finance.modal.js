@@ -14,6 +14,11 @@ const financeSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  fin_firm_id: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   fin_user_id: {
     type: Number,
     required: true,
@@ -86,7 +91,12 @@ const financeSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
-  fin_emi_no: {
+  fin_fine_emi_no: {
+    type: Number,
+    trim: true,
+    default: "",
+  },
+  fin_emi_amt: {
     type: Number,
     trim: true,
     default: "",
@@ -185,7 +195,6 @@ const financeSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
-
 }, {
   timestamps: true,
 });

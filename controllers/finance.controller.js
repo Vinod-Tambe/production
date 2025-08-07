@@ -1,17 +1,14 @@
 const financeService = require('../services/finance.service');
 const {
   createFinanceSchema,
-  updateFinanceSchema,
-  idParamSchema,
 } = require('../validation/finance.validation');
-
-exports.createFinance = async (req, res) => {
+const create_finance = async (req, res) => {
   try {
     await createFinanceSchema.validateAsync(req.body);
-    const finance = await financeService.createFinance(req.body);
+    const finance = await financeService.create_finance(req.body);
     res.status(200).json({
       success: true,
-      message: 'Finance record created successfully',
+      message: 'Finance Add successfully',
       data: finance,
     });
   } catch (err) {
@@ -22,16 +19,12 @@ exports.createFinance = async (req, res) => {
     });
   }
 };
-
-exports.updateFinance = async (req, res) => {
+const update_finance = async (req, res) => {
   try {
-    const fin_id = parseInt(req.params.fin_id, 10);
-    await idParamSchema.validateAsync({ fin_id });
+        const { id } = req.params;
+    await createFinanceSchema.validateAsync(req.body);
 
-    const data = { ...req.body, fin_id };
-    await updateFinanceSchema.validateAsync(data);
-
-    const finance = await financeService.updateFinance(fin_id, req.body);
+    const finance = await financeService.update_finance(id, req.body);
     res.status(200).json({
       success: true,
       message: 'Finance record updated successfully',
@@ -46,12 +39,11 @@ exports.updateFinance = async (req, res) => {
   }
 };
 
-exports.deleteFinance = async (req, res) => {
+const delete_finance = async (req, res) => {
   try {
-    const fin_id = parseInt(req.params.fin_id, 10);
-    await idParamSchema.validateAsync({ fin_id });
+     const { id } = req.params;
 
-    await financeService.deleteFinance(fin_id);
+    await financeService.delete_finance(id);
     res.status(200).json({
       success: true,
       message: 'Finance record deleted successfully',
@@ -65,12 +57,10 @@ exports.deleteFinance = async (req, res) => {
   }
 };
 
-exports.getFinanceDetails = async (req, res) => {
+const get_finance_details = async (req, res) => {
   try {
-    const fin_id = parseInt(req.params.fin_id, 10);
-    await idParamSchema.validateAsync({ fin_id });
-
-    const finance = await financeService.getFinanceDetails(fin_id);
+    const { id } = req.params;
+    const finance = await financeService.get_finance_details(id);
     res.status(200).json({
       success: true,
       message: 'Finance record fetched successfully',
@@ -85,9 +75,9 @@ exports.getFinanceDetails = async (req, res) => {
   }
 };
 
-exports.getAllFinance = async (req, res) => {
+const get_all_finance = async (req, res) => {
   try {
-    const financeList = await financeService.getAllFinance();
+    const financeList = await financeService.get_all_finance();
     res.status(200).json({
       success: true,
       message: 'Finance records fetched successfully',
@@ -101,3 +91,4 @@ exports.getAllFinance = async (req, res) => {
     });
   }
 };
+module.exports={get_all_finance,get_finance_details,create_finance,update_finance,delete_finance}

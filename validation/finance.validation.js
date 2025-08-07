@@ -4,6 +4,7 @@ const Joi = require("joi");
 const baseSchema = {
   fin_own_id: Joi.number().integer().required(),
   fin_user_id: Joi.number().integer().required(),
+  fin_firm_id: Joi.number().integer().required(),
   fin_staff: Joi.number().integer().required(),
 
   fin_prin_amt: Joi.number().required(),
@@ -21,9 +22,10 @@ const baseSchema = {
   fin_collec_amt: Joi.number().allow(""),
   fin_proccess_amt: Joi.number().allow(""),
   fin_fine_amt: Joi.number().allow(""),
-  fin_emi_no: Joi.number().allow(""),
+  fin_fine_emi_no: Joi.number().allow(""),
 
   fin_final_amt: Joi.number().required(),
+  fin_emi_amt: Joi.number().required(),
 
   fin_cash_amt: Joi.number().required(),
   fin_bank_amt: Joi.number().required(),
@@ -48,19 +50,8 @@ const baseSchema = {
 // Validation for creating a finance record
 const createFinanceSchema = Joi.object(baseSchema);
 
-// Validation for updating a finance record
-const updateFinanceSchema = Joi.object({
-  ...baseSchema,
-  fin_id: Joi.number().integer().required()
-});
 
-// Validation for getting or deleting by ID
-const idParamSchema = Joi.object({
-  fin_id: Joi.number().integer().required()
-});
 
 module.exports = {
   createFinanceSchema,
-  updateFinanceSchema,
-  idParamSchema
 };
