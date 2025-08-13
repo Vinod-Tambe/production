@@ -42,7 +42,7 @@ const baseSchema = {
   fin_online_info: Joi.string().allow("").required(),
   fin_card_info: Joi.string().allow("").required(),
 
-  fin_dr_acc_id: Joi.string().allow("").required(),
+  fin_dr_acc_id: Joi.number().allow("").required(),
   fin_pay_info: Joi.string().allow(""),
   fin_other_info: Joi.string().allow("")
 };

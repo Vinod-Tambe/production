@@ -172,7 +172,7 @@ const financeSchema = new mongoose.Schema({
     default: "",
   },
   fin_dr_acc_id:{
-     type: String,
+    type: Number,
     required: true,
     trim: true,
     default: "",
