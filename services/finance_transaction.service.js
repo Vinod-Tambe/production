@@ -1,4 +1,4 @@
-const Finance_Transaction = require("../models/finance_transaction.model");
+const Finance_Trans = require("../models/finance_trans.model");
 const { create_finance_money_entry } = require("./finance_money_trans.service");
 
 const create_finance_transaction = async (data, count = 1) => {
@@ -13,12 +13,12 @@ const create_finance_transaction = async (data, count = 1) => {
     };
     transactions.push(transaction);
   }
-  const created = await Finance_Transaction.insertMany(transactions);
+  const created = await Finance_Trans.insertMany(transactions);
   return created;
 };
 
 const get_Finance_Transaction_EMI = async (firm_id, user_id, fin_id) => {
-  return await Finance_Transaction.find({
+  return await Finance_Trans.find({
     ft_firm_id: firm_id,
     ft_user_id: user_id,
     ft_fin_id: fin_id
@@ -66,7 +66,7 @@ const update_finance_transaction = async (transData) => {
         }
       }
 
-      const updatedEmi = await Finance_Transaction.findOneAndUpdate(
+      const updatedEmi = await Finance_Trans.findOneAndUpdate(
         { _id: emi._id },
         {
           ft_paid_amt: paidAmt,
@@ -105,7 +105,7 @@ const update_finance_transaction = async (transData) => {
 };
 
 const delete_finance_transaction = async (id) => {
-  return await Finance_Transaction.findOneAndDelete({ ft_id: id });
+  return await Finance_Trans.findOneAndDelete({ ft_id: id });
 };
 
 //get all emi paid amount
