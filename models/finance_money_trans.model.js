@@ -1,33 +1,144 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const FinanceMoneyTansSchema = new mongoose.Schema({
-  fm_firm_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Firm', required: true },
-  fm_own_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Owner', required: true },
-  fm_user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  fm_fin_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Finance', required: true },
+const financeMoneyTransactionSchema = new mongoose.Schema({
+  fm_firm_id: {
+    type: Number,
+    required: true,
+  },
+  fm_own_id: {
+    type: Number,
+    required: true,
+  },
+  fm_user_id: {
+    type: Number,
+    required: true,
+  },
+  fm_fin_id: {
+    type: Number,
+    required: true,
+  },
+  fm_add_date: {
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
+    },
+  },
+  fm_trans_crdr: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_trans_date: {
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
+    },
+  },
+  fm_trans_panel: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_trans_type: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_trans_amt: {
+    type: Number,
+    required: true,
+  },
+  fm_cash_amt: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "0",
+  },
+  fm_bank_amt: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "0",
+  },
+  fm_online_amt: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "0",
+  },
+  fm_card_amt: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "0",
+  },
+  fm_cash_acc_id: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "",
+  },
+  fm_bank_acc_id: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "",
+  },
+  fm_online_acc_id: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "",
+  },
+  fm_card_acc_id: {
+    type: Number,
+    required: true,
+    trim: true,
+    default: "",
+  },
+  fm_cash_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_bank_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_online_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_card_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_dr_acc_id: {
+    type: String,
+    required: true,
+    trim: true,
+    default: "",
+  },
+  fm_pay_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  fm_other_info: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+}, {
+  timestamps: true,
+});
 
-  fm_type: { type: String, required: true },
+financeMoneyTransactionSchema.plugin(AutoIncrement, { inc_field: 'fm_id' });
 
-  fm_total_amt: { type: Number, required: true },
-
-  fm_cash_amt: { type: Number, default: 0 },
-  fm_bank_amt: { type: Number, default: 0 },
-  fm_online_amt: { type: Number, default: 0 },
-  fm_card_amt: { type: Number, default: 0 },
-
-  fm_cash_acc_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-  fm_bank_acc_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-  fm_online_acc_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-  fm_card_acc_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-
-  fm_cash_info: { type: String },
-  fm_bank_info: { type: String },
-  fm_online_info: { type: String },
-  fm_card_info: { type: String },
-
-  fm_dr_acc_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Ledger' },
-  fm_crdr: { type: String, enum: ['Dr', 'Cr'] },
-
-}, { timestamps: true });
-
-module.exports = mongoose.model('Finance_Money_Trans', FinanceMoneyTansSchema);
+module.exports = mongoose.model("Finance_Money_Trans", financeMoneyTransactionSchema);

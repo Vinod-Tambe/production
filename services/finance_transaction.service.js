@@ -1,4 +1,5 @@
 const Finance_Transaction = require("../models/finance_transaction.model");
+const { create_finance_money_entry } = require("./finance_money_trans.service");
 
 const create_finance_transaction = async (data, count = 1) => {
   if (count < 1) count = 1;
@@ -21,56 +22,108 @@ const get_Finance_Transaction_EMI = async (firm_id, user_id, fin_id) => {
     ft_firm_id: firm_id,
     ft_user_id: user_id,
     ft_fin_id: fin_id
-  });
+  }).sort({ ft_emi_no: 1 });
 };
 
-const update_finance_transaction = async (firm_id, user_id, fin_id, trans_amt) => {
-  const all_finance_EMI = await get_Finance_Transaction_EMI(firm_id, user_id, fin_id);
 
-  let remainingAmount = trans_amt;
-  for (const emi of all_finance_EMI) {
-    if (remainingAmount <= 0) break;
+const update_finance_transaction = async (transData) => {
+  try {
+    const { fm_firm_id, fm_user_id, fm_fin_id, fm_trans_amt, fm_trans_type } = transData;
 
-    let paidAmt = emi.ft_paid_amt || 0;
-    let emiAmt = emi.ft_emi_amt || 0;
-    let PendingAmt = emi.ft_pending_amt || 0;
-    let newStatus = 'DUE';
-    if (emiAmt <= remainingAmount) {
-      paidAmt = emiAmt;
-      PendingAmt = 0;
-      newStatus = 'PAID';
-      remainingAmount = remainingAmount - paidAmt;
-    } else {
-      paidAmt = remainingAmount;
-      PendingAmt = emiAmt - remainingAmount;
-      remainingAmount = remainingAmount - paidAmt;
-      newStatus = 'PARTIAL';
+    const all_finance_EMI = await get_Finance_Transaction_EMI(fm_firm_id, fm_user_id, fm_fin_id);
+    if (!all_finance_EMI || all_finance_EMI.length === 0) {
+      return { success: false, message: "No EMI records found." };
     }
-    // ✅ Always update, regardless of partial/full
-    const updatedData = await Finance_Transaction.findOneAndUpdate(
-      { _id: emi._id },
-      {
-        ft_paid_amt: paidAmt,
-        ft_pending_amt: PendingAmt,
-        ft_emi_status: newStatus,
-      },
-      { new: true }
-    );
+
+    let total_paid_amt = await get_total_paid_amount(all_finance_EMI);
+    let remainingAmount = fm_trans_type === "PAID"
+      ? total_paid_amt + fm_trans_amt
+      : total_paid_amt - fm_trans_amt;
+
+    const updatedEMIs = [];
+
+    for (const emi of all_finance_EMI) {
+      let paidAmt = emi.ft_paid_amt || 0;
+      const emiAmt = emi.ft_emi_amt || 0;
+      let pendingAmt = emi.ft_pending_amt || emiAmt;
+      let newStatus = 'DUE';
+
+      if (remainingAmount <= 0) {
+        paidAmt = 0;
+        pendingAmt = emiAmt;
+        newStatus = 'DUE';
+      } else {
+        if (emiAmt <= remainingAmount) {
+          paidAmt = emiAmt;
+          pendingAmt = 0;
+          newStatus = 'PAID';
+          remainingAmount -= paidAmt;
+        } else {
+          paidAmt = remainingAmount;
+          pendingAmt = emiAmt - remainingAmount;
+          remainingAmount = 0;
+          newStatus = 'PARTIAL';
+        }
+      }
+
+      const updatedEmi = await Finance_Transaction.findOneAndUpdate(
+        { _id: emi._id },
+        {
+          ft_paid_amt: paidAmt,
+          ft_pending_amt: pendingAmt,
+          ft_emi_status: newStatus,
+        },
+        { new: true }
+      );
+
+      if (updatedEmi) {
+        updatedEMIs.push(updatedEmi);
+      }
+    }
+
+    let moneyEntry = null;
+
+    if (updatedEMIs.length > 0) {
+      // Only create money transaction if EMI update occurred
+      moneyEntry = await create_finance_money_entry(transData);
+    }
+
+    return {
+      success: true,
+      message: 'EMI payment processed successfully.',
+      updatedEmis: updatedEMIs,
+      moneyTransaction: moneyEntry
+    };
+  } catch (error) {
+    console.error("Service Error (update_finance_transaction):", error.message);
+    return {
+      success: false,
+      message: 'Failed to process EMI payment.',
+      error: error.message
+    };
   }
-
-  return { message: 'Update complete' };
 };
-
-
-
 
 const delete_finance_transaction = async (id) => {
   return await Finance_Transaction.findOneAndDelete({ ft_id: id });
 };
+
+//get all emi paid amount
+const get_total_paid_amount = async (all_finance_EMI) => {
+  let totalPaid = 0;
+
+  for (const emi of all_finance_EMI) {
+    const paidAmt = emi.ft_paid_amt || 0;
+    totalPaid += paidAmt;
+  }
+
+  return totalPaid;
+}
 
 module.exports = {
   create_finance_transaction,
   get_Finance_Transaction_EMI,
   update_finance_transaction,
   delete_finance_transaction,
+  get_total_paid_amount
 };

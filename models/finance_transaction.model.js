@@ -59,4 +59,4 @@ const financeTransactionSchema = new mongoose.Schema({
 
 financeTransactionSchema.plugin(AutoIncrement, { inc_field: 'ft_id' });
 
-module.exports = mongoose.model("Finance_Transaction", financeTransactionSchema);
+module.exports = mongoose.model("Finance_Trans", financeTransactionSchema);

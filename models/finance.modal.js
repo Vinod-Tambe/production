@@ -6,7 +6,7 @@ const financeSchema = new mongoose.Schema({
     type: String,
     default: () => {
       const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-'); // "DD-MM-YYYY"
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
     }
   },
   fin_own_id: {
@@ -24,7 +24,7 @@ const financeSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  fin_staff: {
+  fin_staff_id: {
     type: Number,
     required: true,
     default: 0,
@@ -108,26 +108,22 @@ const financeSchema = new mongoose.Schema({
     default: "",
   },
   fin_cash_amt: {
-    type: Number,
-    required: true,
+    type: String,
     trim: true,
     default: "",
   },
   fin_bank_amt: {
-    type: Number,
-    required: true,
+    type: String,
     trim: true,
     default: "",
   },
   fin_online_amt: {
-    type: Number,
-    required: true,
+    type: String,
     trim: true,
     default: "",
   },
   fin_card_amt: {
-    type: Number,
-    required: true,
+    type: String,
     trim: true,
     default: "",
   },
@@ -157,25 +153,21 @@ const financeSchema = new mongoose.Schema({
   },
    fin_cash_info: {
     type: String,
-    required: true,
     trim: true,
     default: "",
   },
   fin_bank_info: {
     type: String,
-    required: true,
     trim: true,
     default: "",
   },
   fin_online_info: {
     type: String,
-    required: true,
     trim: true,
     default: "",
   },
   fin_card_info: {
     type: String,
-    required: true,
     trim: true,
     default: "",
   },

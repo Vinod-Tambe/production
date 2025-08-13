@@ -19,7 +19,8 @@ async function create_finance(data) {
         ft_pending_amt: result.fin_emi_amt,
         ft_emi_status: 'Due'
       };
-      await Finance_Transaction.create_finance_transaction(finance_trans_data, result.fin_no_of_emi);
+     const response= await Finance_Transaction.create_finance_transaction(finance_trans_data, result.fin_no_of_emi);
+     console.log(response);
     }
 
     return result;
