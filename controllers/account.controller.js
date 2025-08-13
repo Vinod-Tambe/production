@@ -1,8 +1,11 @@
 const accountService = require("../services/account.service");
+const { getOwnerIdFromToken } = require("../utils/tokenHelper");
 const { createAccountSchema } = require("../validation/account.validation");
 
 exports.createAccount = async (req, res) => {
   try {
+    const ownerId = await getOwnerIdFromToken(req);
+    req.body.acc_own_id = ownerId;
     await createAccountSchema.validateAsync(req.body);
     const account = await accountService.createAccount(req.body);
     res.status(200).json({
