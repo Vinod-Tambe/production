@@ -154,7 +154,7 @@ async function get_finance_emi(req, res) {
      res.status(200).json({
       success: true,
       message: "success to fetch transactions",
-      DataTransfer: transaction
+      data: transaction
     });
   } catch (error) {
     console.error('Get finance transaction error:', error);
