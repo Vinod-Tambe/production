@@ -24,10 +24,19 @@ const create_finance_transaction = async (
   let startDate;
   try {
     if (start_date) {
-      const [day, month, year] = start_date.split("-").map(Number);
-      startDate = new Date(year, month - 1, day);
+      // Check format: YYYY-MM-DD or DD-MM-YYYY
+      const dateParts = start_date.split("-").map(Number);
+      if (dateParts[0] > 31) {
+        // Assume YYYY-MM-DD
+        const [year, month, day] = dateParts;
+        startDate = new Date(year, month - 1, day);
+      } else {
+        // Assume DD-MM-YYYY
+        const [day, month, year] = dateParts;
+        startDate = new Date(year, month - 1, day);
+      }
       if (isNaN(startDate.getTime())) {
-        throw new Error("Invalid start_date format. Use DD-MM-YYYY");
+        throw new Error("Invalid start_date format. Use YYYY-MM-DD or DD-MM-YYYY");
       }
     } else {
       startDate = new Date(data.fm_start_date);
@@ -74,14 +83,12 @@ const create_finance_transaction = async (
   }
 };
 
-// Example formatDate function (must be defined)
 const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
+  return `${year}-${month}-${day}`;
 };
-
 
 
 
