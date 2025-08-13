@@ -1,21 +1,89 @@
 const Finance_Trans = require("../models/finance_trans.model");
 const { create_finance_money_entry } = require("./finance_money_trans.service");
 
-const create_finance_transaction = async (data, count = 1) => {
-  if (count < 1) count = 1;
+const create_finance_transaction = async (
+  data,
+  count = 1,
+  fin_freq = 1,
+  fin_freq_type = "MONTHLY",
+  start_date
+) => {
+  fin_freq = parseInt(fin_freq, 10);
+  // Validate inputs
+  if (!Number.isInteger(count) || count < 1) {
+    throw new Error("Count must be a positive integer");
+  }
+  if (!Number.isInteger(fin_freq) || fin_freq < 1) {
+    throw new Error("Frequency must be a positive integer");
+  }
+  if (!["MONTHLY", "DAILY"].includes(fin_freq_type)) {
+    throw new Error("Frequency type must be 'MONTHLY' or 'DAILY'");
+  }
+
+  // Parse start date
+  let startDate;
+  try {
+    if (start_date) {
+      const [day, month, year] = start_date.split("-").map(Number);
+      startDate = new Date(year, month - 1, day);
+      if (isNaN(startDate.getTime())) {
+        throw new Error("Invalid start_date format. Use DD-MM-YYYY");
+      }
+    } else {
+      startDate = new Date(data.fm_start_date);
+      if (isNaN(startDate.getTime())) {
+        throw new Error("Invalid fm_start_date in data");
+      }
+    }
+  } catch (error) {
+    throw new Error(`Date parsing error: ${error.message}`);
+  }
 
   const transactions = [];
+  let currentStartDate = new Date(startDate);
 
   for (let i = 1; i <= count; i++) {
+    // Calculate due date
+    const dueDate = new Date(currentStartDate);
+    if (fin_freq_type === "MONTHLY") {
+      dueDate.setMonth(dueDate.getMonth() + fin_freq);
+    } else if (fin_freq_type === "DAILY") {
+      dueDate.setDate(dueDate.getDate() + fin_freq);
+    }
+
+    // Create transaction
     const transaction = {
       ...data,
-      ft_emi_no: i
+      ft_emi_no: i,
+      ft_start_date: formatDate(currentStartDate),
+      ft_due_date: formatDate(dueDate),
     };
+
     transactions.push(transaction);
+
+    // Set next EMI's start date to current due date
+    currentStartDate = new Date(dueDate);
   }
-  const created = await Finance_Trans.insertMany(transactions);
-  return created;
+
+  // Insert transactions into database
+  try {
+    const created = await Finance_Trans.insertMany(transactions);
+    return created;
+  } catch (error) {
+    throw new Error(`Failed to insert transactions: ${error.message}`);
+  }
 };
+
+// Example formatDate function (must be defined)
+const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+
+
 
 const get_Finance_Transaction_EMI = async (firm_id, user_id, fin_id) => {
   return await Finance_Trans.find({

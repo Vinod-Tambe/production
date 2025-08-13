@@ -6,7 +6,8 @@ async function create_finance(data) {
     // Create and save the finance entry
     const finance = new Finance(data);
     const result = await finance.save();
-
+    const fin_freq=result.fin_freq;
+    const fin_freq_type=result.fin_freq_type;
     if (result) {
       const finance_trans_data = {
         ft_firm_id: result.fin_firm_id,
@@ -19,8 +20,7 @@ async function create_finance(data) {
         ft_pending_amt: result.fin_emi_amt,
         ft_emi_status: 'Due'
       };
-     const response= await Finance_Transaction.create_finance_transaction(finance_trans_data, result.fin_no_of_emi);
-     console.log(response);
+     const response= await Finance_Transaction.create_finance_transaction(finance_trans_data, result.fin_no_of_emi,result.fin_freq,result.fin_freq_type,result.fin_start_date);
     }
 
     return result;

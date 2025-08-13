@@ -29,6 +29,20 @@ const financeTransactionSchema = new mongoose.Schema({
       return now.toISOString().slice(0, 10).split("-").reverse().join("-");
     },
   },
+  ft_start_date: {
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
+    },
+  },
+  ft_due_date: {
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
+    },
+  },
   ft_paid_date: {
     type: String,
   },
