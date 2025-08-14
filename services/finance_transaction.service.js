@@ -102,80 +102,59 @@ const get_Finance_Transaction_EMI = async (firm_id, user_id, fin_id) => {
 
 
 const update_finance_transaction = async (transData) => {
+  const { fm_firm_id, fm_user_id, fm_fin_id, fm_trans_amt, fm_trans_type } = transData;
   try {
-    const { fm_firm_id, fm_user_id, fm_fin_id, fm_trans_amt, fm_trans_type } = transData;
+    if (fm_trans_amt === 0) {
+      return { success: false, message: "Transaction amount cannot be zero." };
+    }
 
     const all_finance_EMI = await get_Finance_Transaction_EMI(fm_firm_id, fm_user_id, fm_fin_id);
-    if (!all_finance_EMI || all_finance_EMI.length === 0) {
+    if (!all_finance_EMI?.length) {
       return { success: false, message: "No EMI records found." };
     }
 
-    let total_paid_amt = await get_total_paid_amount(all_finance_EMI);
-    let remainingAmount = fm_trans_type === "PAID"
-      ? total_paid_amt + fm_trans_amt
-      : total_paid_amt - fm_trans_amt;
+    const total_paid = await get_total_paid_amount(all_finance_EMI);
+    let remainingAmount = fm_trans_type === "PAID" ? total_paid + fm_trans_amt : total_paid - fm_trans_amt;
 
-    const updatedEMIs = [];
-
+    const updateOperations = [];
     for (const emi of all_finance_EMI) {
-      let paidAmt = emi.ft_paid_amt || 0;
-      const emiAmt = emi.ft_emi_amt || 0;
-      let pendingAmt = emi.ft_pending_amt || emiAmt;
-      let newStatus = 'DUE';
-
       if (remainingAmount <= 0) {
-        paidAmt = 0;
-        pendingAmt = emiAmt;
-        newStatus = 'DUE';
-      } else {
-        if (emiAmt <= remainingAmount) {
-          paidAmt = emiAmt;
-          pendingAmt = 0;
-          newStatus = 'PAID';
-          remainingAmount -= paidAmt;
-        } else {
-          paidAmt = remainingAmount;
-          pendingAmt = emiAmt - remainingAmount;
-          remainingAmount = 0;
-          newStatus = 'PARTIAL';
+        updateOperations.push({
+          updateOne: {
+            filter: { _id: emi._id },
+            update: { ft_paid_amt: 0, ft_pending_amt: emi.ft_emi_amt || 0, ft_emi_status: 'DUE' }
+          }
+        });
+        continue;
+      }
+
+      const emiAmt = emi.ft_emi_amt || 0;
+      const paidAmt = Math.min(emiAmt, remainingAmount);
+      updateOperations.push({
+        updateOne: {
+          filter: { _id: emi._id },
+          update: {
+            ft_paid_amt: paidAmt,
+            ft_pending_amt: emiAmt - paidAmt,
+            ft_emi_status: paidAmt === emiAmt ? 'PAID' : 'PARTIAL'
+          }
         }
-      }
-
-      const updatedEmi = await Finance_Trans.findOneAndUpdate(
-        { _id: emi._id },
-        {
-          ft_paid_amt: paidAmt,
-          ft_pending_amt: pendingAmt,
-          ft_emi_status: newStatus,
-        },
-        { new: true }
-      );
-
-      if (updatedEmi) {
-        updatedEMIs.push(updatedEmi);
-      }
+      });
+      remainingAmount -= paidAmt;
     }
 
-    let moneyEntry = null;
-
-    if (updatedEMIs.length > 0) {
-      // Only create money transaction if EMI update occurred
-      moneyEntry = await create_finance_money_entry(transData);
-    }
+    const updatedEMIs = await Finance_Trans.bulkWrite(updateOperations, { ordered: true });
+    const moneyEntry = updatedEMIs.modifiedCount > 0 ? await create_finance_money_entry(transData) : null;
 
     return {
       success: true,
       message: 'EMI payment processed successfully.',
-      updatedEmis: updatedEMIs,
+      updatedEmis: updatedEMIs.result,
       moneyTransaction: moneyEntry
     };
   } catch (error) {
     console.error("Service Error (update_finance_transaction):", error.message);
-    return {
-      success: false,
-      message: 'Failed to process EMI payment.',
-      error: error.message
-    };
+    return { success: false, message: 'Failed to process EMI payment.', error: error.message };
   }
 };
 
