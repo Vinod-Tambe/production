@@ -1,4 +1,5 @@
 const Finance = require('../models/finance.modal');
+const { delete_finance_money_entries } = require('./finance_money_trans.service');
 const Finance_Transaction = require('./finance_transaction.service');
 
 async function create_finance(data) {
@@ -41,6 +42,8 @@ async function update_finance(id, data) {
 
 async function delete_finance(id) {
   const result = await Finance.findByIdAndDelete(id);
+  await Finance_Transaction.delete_finance_transaction(id);
+  await delete_finance_money_entries(id);
   return result;
 }
 

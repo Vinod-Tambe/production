@@ -88,7 +88,7 @@ const get_finance_details = async (req, res) => {
 
 const get_all_finance = async (req, res) => {
   try {
-    const financeList = await financeService.get_all_finance();
+    const financeList = await financeService.get_all_finance(req.query);
     res.status(200).json({
       success: true,
       message: 'Finance records fetched successfully',

@@ -21,7 +21,12 @@ const get_finance_money_entries = async (filter = {}) => {
   }
 };
 
+const delete_finance_money_entries = async (id) => {
+  return await Finance_Money_Transaction.deleteMany({ fm_fin_id: id });
+};
+
 module.exports = {
   create_finance_money_entry,
-  get_finance_money_entries
+  get_finance_money_entries,
+  delete_finance_money_entries
 };

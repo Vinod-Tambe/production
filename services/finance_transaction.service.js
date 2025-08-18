@@ -159,7 +159,7 @@ const update_finance_transaction = async (transData) => {
 };
 
 const delete_finance_transaction = async (id) => {
-  return await Finance_Trans.findOneAndDelete({ ft_id: id });
+  return await Finance_Trans.deleteMany({ ft_fin_id: id });
 };
 
 //get all emi paid amount
