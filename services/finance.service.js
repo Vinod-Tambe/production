@@ -41,7 +41,7 @@ async function update_finance(id, data) {
 }
 
 async function delete_finance(id) {
-  const result = await Finance.findByIdAndDelete(id);
+  const result = await Finance.findOneAndDelete({ fin_id: id });
   await Finance_Transaction.delete_finance_transaction(id);
   await delete_finance_money_entries(id);
   return result;
