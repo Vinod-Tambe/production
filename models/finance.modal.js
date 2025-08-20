@@ -24,6 +24,10 @@ const financeSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  fin_jrnl_id: {
+    type: Number,
+    default: 0,
+  },
   fin_staff_id: {
     type: Number,
     required: true,

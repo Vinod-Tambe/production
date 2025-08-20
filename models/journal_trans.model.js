@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const journalTransSchema = new mongoose.Schema({
-  jrtr_id: {
-    type: Number,
-    unique: true
-  },
   jrtr_jrnl_id: {
     type: Number,
     required: true
@@ -41,11 +37,9 @@ const journalTransSchema = new mongoose.Schema({
   },
   jrtr_cr_acc_id: {
     type: Number,
-    required: true
   },
   jrtr_dr_acc_id: {
     type: Number,
-    required: true
   },
   jrtr_cr_amt: {
     type: [Number, String],

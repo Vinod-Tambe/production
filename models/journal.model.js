@@ -25,15 +25,14 @@ const journalSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+   jrnl_amt: {
+    type: [Number, String],
+    required: true
+  },
   jrnl_panel: {
     type: String,
     required: true,
     trim: true
-  },
-  jrnl_crdr: {
-    type: String,
-    enum: ['CR', 'DR'],
-    required: true
   },
   jrnl_other_inof: {
     type: String,

@@ -1,4 +1,4 @@
-const JournalTrans = require('../models/JournalTrans');
+const JournalTrans = require('../models/journal_trans.model');
 
 /**
  * Create multiple journal transaction entries.
