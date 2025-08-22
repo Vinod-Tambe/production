@@ -7,7 +7,7 @@ exports.createAccount = async (req, res) => {
     const ownerId = await getOwnerIdFromToken(req);
     req.body.acc_own_id = ownerId;
     await createAccountSchema.validateAsync(req.body);
-    const account = await accountService.createAccount(req.body);
+    const account = await accountService.create_account(req.body);
     res.status(200).json({
       success: true,
       message: "Account created successfully",
@@ -24,7 +24,7 @@ exports.createAccount = async (req, res) => {
 
 exports.getAllAccounts = async (req, res) => {
   try {
-    const accounts = await accountService.getAllAccounts();
+    const accounts = await accountService.get_all_account();
     res.status(200).json({
       success: true,
       message: "Accounts retrieved successfully",
@@ -41,7 +41,7 @@ exports.getAllAccounts = async (req, res) => {
 
 exports.getAccountById = async (req, res) => {
   try {
-    const account = await accountService.getAccountById(req.params.id);
+    const account = await accountService.get_account_by_id(req.params.id);
     if (!account) {
       return res.status(200).json({
         success: false,
@@ -67,7 +67,7 @@ exports.updateAccount = async (req, res) => {
       const ownerId = await getOwnerIdFromToken(req);
     req.body.acc_own_id = ownerId;
     await createAccountSchema.validateAsync(req.body);
-    const account = await accountService.updateAccount(req.params.id, req.body);
+    const account = await accountService.update_account(req.params.id, req.body);
     if (!account) {
       return res.status(200).json({
         success: false,
@@ -90,7 +90,7 @@ exports.updateAccount = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
   try {
-    const account = await accountService.deleteAccount(req.params.id);
+    const account = await accountService.delete_account(req.params.id);
     if (!account) {
       return res.status(200).json({
         success: false,

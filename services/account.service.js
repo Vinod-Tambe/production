@@ -1,30 +1,46 @@
 const Account = require("../models/account.model");
 const Firm = require("../models/firm.model");
-
-exports.createAccount = async (data) => {
-  const duplicate = await Account.findOne({
+// Helper function to check for duplicate accounts
+const check_duplicate_account = async (accounts, excludeId = null) => {
+  const firmNamePairs = accounts.map(data => ({
     acc_firm_id: data.acc_firm_id,
     acc_name: data.acc_name.trim(),
-  });
+  }));
 
-  if (duplicate) {
-    throw new Error("Account name already exists for this firm");
+  const query = excludeId
+    ? { $or: firmNamePairs, acc_id: { $ne: excludeId } }
+    : { $or: firmNamePairs };
+
+  const duplicates = await Account.find(query).select('acc_firm_id acc_name');
+  if (duplicates.length > 0) {
+    const duplicateNames = duplicates.map(d => `${d.acc_name} (firm ID: ${d.acc_firm_id})`).join(', ');
+    throw new Error(`Account names already exist: ${duplicateNames}`);
   }
+};
 
+exports.create_account = async (data) => {
+  await check_duplicate_account([data]);
   return await Account.create(data);
 };
 
-exports.updateAccount = async (id, updateData) => {
-  const existing = await Account.findOne({
-    acc_firm_id: updateData.acc_firm_id,
-    acc_name: updateData.acc_name.trim(),
-    acc_id: { $ne: id } // exclude the current record
-  });
-
-  if (existing) {
-    throw new Error("Another account with the same name exists for this firm");
+exports.create_multiple_account = async (accounts) => {
+  if (!Array.isArray(accounts) || accounts.length === 0) {
+    throw new Error("Input must be a non-empty array of account data");
   }
 
+  const savedAccounts = [];
+
+  for (const accountData of accounts) {
+    const account = new Account(accountData);
+    const savedAccount = await account.save(); // This triggers the auto-increment plugin
+    savedAccounts.push(savedAccount);
+  }
+
+  return savedAccounts;
+};
+
+exports.update_account = async (id, updateData) => {
+  await check_duplicate_account([{ acc_firm_id: updateData.acc_firm_id, acc_name: updateData.acc_name.trim() }], id);
   return await Account.findOneAndUpdate(
     { acc_id: id },
     updateData,
@@ -32,15 +48,14 @@ exports.updateAccount = async (id, updateData) => {
   );
 };
 
-exports.getAllAccounts = async () => {
+exports.get_all_account = async () => {
   return await Account.find();
 };
 
-exports.getAccountById = async (id) => {
+exports.get_account_by_id = async (id) => {
   return await Account.findOne({ acc_id: id });
 };
 
-
-exports.deleteAccount = async (id) => {
+exports.delete_account = async (id) => {
   return await Account.findOneAndDelete({ acc_id: id });
 };

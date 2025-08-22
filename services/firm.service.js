@@ -1,4 +1,6 @@
+const { cr_acount_name, cr_acount_primary, dr_acount_name, dr_acount_primary } = require("../data/account.data");
 const Firm = require("../models/firm.model");
+const { create_multiple_account } = require("./account.service");
 
 const create_firm = async (firmData) => {
   try {
@@ -40,7 +42,7 @@ const create_firm = async (firmData) => {
     // 5. All checks passed, create and save firm
     const newFirm = new Firm(firmData);
     const savedFirm = await newFirm.save();
-
+    await create_default_account(savedFirm.firm_own_id,savedFirm.firm_id);
     return { success: true, data: savedFirm };
   } catch (err) {
     // Catch validation or other unexpected errors
@@ -80,7 +82,23 @@ const get_all_firm = async (fields) => {
     .sort({ firm_add_date: -1 });
 };
 
-
+const create_default_account=async(acc_own_id,acc_firm_id)=>{
+    const cr_account_requests = cr_acount_name.map((name, index) => ({
+    acc_name: name,
+    acc_pre_acc: cr_acount_primary[index],
+    acc_crdr: "CR",
+    acc_own_id,
+    acc_firm_id
+      }));
+    const dr_account_requests = dr_acount_name.map((name, index) => ({
+    acc_name: name,
+    acc_pre_acc: dr_acount_primary[index],
+    acc_crdr: "DR",
+    acc_own_id,
+    acc_firm_id
+      }));
+    create_multiple_account(dr_account_requests)
+}
 
 module.exports = {
   create_firm,

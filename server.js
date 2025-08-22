@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
     try {
         await connectDb();
-        console.log(`Ecommerce API listening on PORT ${PORT}`);
+        console.log(`Khataboss API listening on PORT ${PORT}`);
     } catch (error) {
         console.error("Database connection failed:", error);
     }
