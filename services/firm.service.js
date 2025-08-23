@@ -1,4 +1,4 @@
-const { cr_acount_name, cr_acount_primary, dr_acount_name, dr_acount_primary } = require("../data/account.data");
+const {  cr_accounts, dr_accounts } = require("../data/account.data");
 const Firm = require("../models/firm.model");
 const { create_multiple_account } = require("./account.service");
 
@@ -83,21 +83,26 @@ const get_all_firm = async (fields) => {
 };
 
 const create_default_account=async(acc_own_id,acc_firm_id)=>{
-    const cr_account_requests = cr_acount_name.map((name, index) => ({
-    acc_name: name,
-    acc_pre_acc: cr_acount_primary[index],
-    acc_crdr: "CR",
-    acc_own_id,
-    acc_firm_id
-      }));
-    const dr_account_requests = dr_acount_name.map((name, index) => ({
-    acc_name: name,
-    acc_pre_acc: dr_acount_primary[index],
-    acc_crdr: "DR",
-    acc_own_id,
-    acc_firm_id
-      }));
-    create_multiple_account(dr_account_requests)
+ // Using the new formatted objects
+const cr_account_requests = cr_accounts.map(acc => ({
+  acc_name: acc.acc_name,
+  acc_pre_acc: acc.acc_pre_acc,
+  acc_balance_type: "CR",
+  acc_own_id,
+  acc_firm_id
+}));
+
+const dr_account_requests = dr_accounts.map(acc => ({
+  acc_name: acc.acc_name,
+  acc_pre_acc: acc.acc_pre_acc,
+  acc_balance_type: "DR",
+  acc_own_id,
+  acc_firm_id
+}));
+const all_account_requests = [...cr_account_requests, ...dr_account_requests];
+
+create_multiple_account(all_account_requests);
+
 }
 
 module.exports = {
