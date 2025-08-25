@@ -22,8 +22,8 @@ const financeMoneyTransactionSchema = new mongoose.Schema({
     type: String,
     default: () => {
       const now = new Date();
-      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
-    },
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
+    }
   },
   fm_trans_crdr: {
     type: String,
@@ -32,10 +32,7 @@ const financeMoneyTransactionSchema = new mongoose.Schema({
   },
   fm_trans_date: {
     type: String,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
-    },
+   required:true,
   },
   fm_trans_panel: {
     type: String,

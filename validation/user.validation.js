@@ -50,12 +50,12 @@ const userValidationSchema = Joi.object({
 
   user_max_qualification: Joi.string().allow('').optional(),
 
-  user_birth_date: Joi.date().required().messages({
+  user_birth_date: Joi.string().required().messages({
     'date.base': 'Birth date must be a valid date',
     'any.required': 'Birth date is required',
   }),
 
-  user_anniversary_date: Joi.date().allow(null).optional(),
+  user_anniversary_date: Joi.string().allow(null).optional(),
 
   user_pan_no: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/).allow('').messages({
     'string.pattern.base': 'PAN number must be valid (e.g., ABCDE1234F)'

@@ -48,7 +48,7 @@ exports.createAccountSchema = Joi.object({
     "string.base": `"Branch Name" must be a string`
   }),
 
-  acc_opening_date: Joi.date().required().messages({
+  acc_opening_date: Joi.string().required().messages({
     "date.base": `"Opening Date" must be a valid date`,
     "any.required": `"Opening Date" is required`
   }),

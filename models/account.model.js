@@ -3,8 +3,11 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const accountSchema = new mongoose.Schema({
   acc_add_date: {
-    type: Date,
-    default: Date.now,
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
+    }
   },
   acc_own_id: {
     type: Number,
@@ -54,8 +57,8 @@ const accountSchema = new mongoose.Schema({
     default: "",
   },
   acc_opening_date: {
-    type: Date,
-    default: null,
+    required: true,
+    type: String, // changed to string for consistent format
   },
   acc_address: {
     type: String,

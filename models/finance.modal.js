@@ -4,7 +4,7 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const financeSchema = new mongoose.Schema({
   fin_add_date: {
     type: String,
-    default: () => {
+   default: () => {
       const now = new Date();
       return now.toISOString().slice(0, 10).split('-').reverse().join('-');
     }

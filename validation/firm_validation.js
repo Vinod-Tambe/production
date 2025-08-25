@@ -84,7 +84,6 @@ const createFirmSchema = Joi.object({
 
   firm_pay_declaration: Joi.string().allow(""),
   firm_api_key: Joi.string().allow(""),
-  firm_start_date: Joi.date().allow(null),
   firm_balance: Joi.number().messages({
     "number.base": "Balance must be a number",
   }),
@@ -128,6 +127,10 @@ const updateFirmSchema = Joi.object({
 
   firm_desc: Joi.string().allow("").messages({
     "string.base": "Firm description must be a string",
+  }),
+
+  firm_start_date: Joi.string().allow("").required().messages({
+    "string.base": "IS Not Empty",
   }),
 
   firm_address: Joi.string().allow("").messages({
@@ -193,7 +196,6 @@ const updateFirmSchema = Joi.object({
 
   firm_pay_declaration: Joi.string().allow(""),
   firm_api_key: Joi.string().allow(""),
-  firm_start_date: Joi.date().allow(null),
   firm_balance: Joi.number().messages({
     "number.base": "Balance must be a number",
   }),

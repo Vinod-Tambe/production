@@ -6,7 +6,7 @@ const firmSchema = new mongoose.Schema({
     type: String,
     default: () => {
       const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-'); // "DD-MM-YYYY"
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
     }
   },
   firm_own_id: {
@@ -164,8 +164,8 @@ const firmSchema = new mongoose.Schema({
     default: "",
   },
   firm_start_date: {
-    type: Date,
-    default: null,
+    required:true,
+    type: String, // changed to string for consistent format
   },
   firm_balance: {
     type: Number,

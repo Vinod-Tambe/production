@@ -8,7 +8,10 @@ const ownerSchema = new mongoose.Schema({
   },
   own_add_date: {
     type: Date,
-    default: Date.now,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
+    }
   },
   own_soft_date: {
     type: Date,

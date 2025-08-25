@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 const userSchema = new mongoose.Schema({
   user_id: { type: Number, unique: true, trim: true, default: "" },
-  user_add_date: { type: Date, default: Date.now },
+  user_add_date: { type: String,  default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
+    }},
   user_firm_id: { type: Number, required: true, trim: true, default: "" },
   user_acc_id: { type: Number, required: true, trim: true, default: "" },
   user_own_id: { type: Number, required: true, trim: true, default: 0 },
@@ -48,8 +51,8 @@ const userSchema = new mongoose.Schema({
   },
 
   user_max_qualification: { type: String, trim: true, default: "" },
-  user_birth_date: { type: Date, required: true },
-  user_anniversary_date: { type: Date, default: null },
+  user_birth_date: { type: String, required: true },
+  user_anniversary_date: { type: String, default: null },
 
   user_pan_no: {
     type: String,
