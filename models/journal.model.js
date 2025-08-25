@@ -22,10 +22,14 @@ const journalSchema = new mongoose.Schema({
     default: Date.now
   },
   jrnl_date: {
-    type: Date,
-    required: true
+    type: String,
+    required: true,
+    default: () => {
+      const now = new Date();
+      return now.toISOString().slice(0, 10).split('-').reverse().join('-'); // "DD-MM-YYYY"
+    }
   },
-   jrnl_amt: {
+  jrnl_amt: {
     type: [Number, String],
     required: true
   },
