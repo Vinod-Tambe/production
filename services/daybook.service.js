@@ -97,7 +97,7 @@ const get_add_new_finance_data = async (filters = {}) => {
     const financeRecords = await Finance.find(query)
       .select("fin_start_date fin_firm_id fin_user_id fin_cash_amt fin_bank_amt fin_online_amt fin_card_amt")
       .lean();
-
+      if (financeRecords.length <= 0) {  return 0}
     return {
       title: "FINANCE ADDED",
       colorClass: "bg-green",
@@ -134,7 +134,7 @@ const get_finance_paid_emi_data = async (filters = {}) => {
     const paidRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-
+     if (paidRecords.length <= 0) {  return 0}
     return {
       title: "FINANCE EMI DEPOSIT",
       colorClass: "bg-red",
@@ -171,7 +171,7 @@ const get_finance_rollback_emi_data = async (filters = {}) => {
     const rollbackRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-
+     if (rollbackRecords.length <= 0) {  return 0}
     return {
       title: "FINANCE EMI ROLLBACK",
       colorClass: "bg-blue",
@@ -193,8 +193,20 @@ const get_all_daybook_data = async (filters = {}) => {
       get_finance_rollback_emi_data(filters),
       get_day_book_summary(filters),
     ]);
-
-    return {daybook_data:[financeData, paidEmiData, rollbackEmiData],summary:summaryData};
+    let response_arr=[];
+    if(financeData!==0)
+    {
+      response_arr.push(financeData);
+    }
+    if(paidEmiData!==0)
+    {
+      response_arr.push(paidEmiData);
+    }
+    if(rollbackEmiData!==0)
+    {
+      response_arr.push(rollbackEmiData);
+    }
+    return {daybook_data:response_arr,summary:summaryData};
   } catch (error) {
     console.error("Error combining daybook data:", error);
     return [];
@@ -454,8 +466,4 @@ const get_day_book_summary = async (filters = {}) => {
 
 module.exports = {
   get_all_daybook_data,
-  get_add_new_finance_data,
-  get_finance_paid_emi_data,
-  get_finance_rollback_emi_data,
-  get_day_book_summary,
 };
