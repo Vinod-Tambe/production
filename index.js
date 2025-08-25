@@ -47,5 +47,8 @@ app.use("/image", imageRouters);
 const financeRouters = require("./routes/finance.route.js");
 app.use("/finance", financeRouters);
 
+const daybookRouters = require("./routes/daybook.route.js");
+app.use("/daybook", daybookRouters);
+
 // ✅ Export only once at the end
 module.exports = app;
