@@ -96,8 +96,7 @@ const get_add_new_finance_data = async (filters = {}) => {
 
     const financeRecords = await Finance.find(query)
       .select("fin_start_date fin_firm_id fin_user_id fin_cash_amt fin_bank_amt fin_online_amt fin_card_amt")
-      .lean()
-      .limit(1000);
+      .lean();
 
     return {
       title: "FINANCE ADDED",
@@ -134,8 +133,7 @@ const get_finance_paid_emi_data = async (filters = {}) => {
 
     const paidRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
-      .lean()
-      .limit(1000);
+      .lean();
 
     return {
       title: "FINANCE EMI DEPOSIT",
@@ -172,8 +170,7 @@ const get_finance_rollback_emi_data = async (filters = {}) => {
 
     const rollbackRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
-      .lean()
-      .limit(1000);
+      .lean();
 
     return {
       title: "FINANCE EMI ROLLBACK",
@@ -197,7 +194,7 @@ const get_all_daybook_data = async (filters = {}) => {
       get_day_book_summary(filters),
     ]);
 
-    return [financeData, paidEmiData, rollbackEmiData, summaryData];
+    return {daybook_data:[financeData, paidEmiData, rollbackEmiData],summary:summaryData};
   } catch (error) {
     console.error("Error combining daybook data:", error);
     return [];
@@ -443,20 +440,12 @@ const get_day_book_summary = async (filters = {}) => {
     );
 
     return {
-      title: "DAYBOOK SUMMARY",
-      colorClass: "bg-purple",
-      amtColor: "text-primary",
-      column: ["TYPE", "CASH", "BANK", "ONLINE", "CARD"],
-      data: [
-        {
           type: "OPENING BALANCE",
           total_cash_amt: cash_open_amt,
           total_bank_amt: bank_open_amt,
           total_online_amt: online_open_amt,
           total_card_amt: card_open_amt,
           total_open_amt: total_open_amt,
-        }
-      ],
     };
   } catch (error) {
     return handleError(error, "DAYBOOK SUMMARY", "bg-purple", "text-primary", true);
