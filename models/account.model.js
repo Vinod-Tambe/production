@@ -58,7 +58,7 @@ const accountSchema = new mongoose.Schema({
   },
   acc_opening_date: {
     required: true,
-    type: String, // changed to string for consistent format
+    type: String, 
   },
   acc_address: {
     type: String,

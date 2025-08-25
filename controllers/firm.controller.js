@@ -10,6 +10,7 @@ const create_firm = async (req, res) => {
     // Validate request body using Joi schema
     const { error } = createFirmSchema.validate(req.body, { abortEarly: false });
     if (error) {
+      console.log(error);
       return res.status(400).json({
         success: false,
         message: error.details.map((err) => err.message).join(", "),

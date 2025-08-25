@@ -165,7 +165,7 @@ const firmSchema = new mongoose.Schema({
   },
   firm_start_date: {
     required:true,
-    type: String, // changed to string for consistent format
+    type: String,
   },
   firm_balance: {
     type: Number,

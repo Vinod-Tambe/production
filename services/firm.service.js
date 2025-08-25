@@ -42,7 +42,7 @@ const create_firm = async (firmData) => {
     // 5. All checks passed, create and save firm
     const newFirm = new Firm(firmData);
     const savedFirm = await newFirm.save();
-    await create_default_account(savedFirm.firm_own_id,savedFirm.firm_id);
+    await create_default_account(savedFirm.firm_own_id,savedFirm.firm_id,savedFirm.firm_start_date);
     return { success: true, data: savedFirm };
   } catch (err) {
     // Catch validation or other unexpected errors
@@ -82,12 +82,13 @@ const get_all_firm = async (fields) => {
     .sort({ firm_add_date: -1 });
 };
 
-const create_default_account=async(acc_own_id,acc_firm_id)=>{
+const create_default_account=async(acc_own_id,acc_firm_id,acc_opening_date)=>{
  // Using the new formatted objects
 const cr_account_requests = cr_accounts.map(acc => ({
   acc_name: acc.acc_name,
   acc_pre_acc: acc.acc_pre_acc,
   acc_balance_type: "CR",
+  acc_opening_date,
   acc_own_id,
   acc_firm_id
 }));
@@ -96,11 +97,11 @@ const dr_account_requests = dr_accounts.map(acc => ({
   acc_name: acc.acc_name,
   acc_pre_acc: acc.acc_pre_acc,
   acc_balance_type: "DR",
+  acc_opening_date,
   acc_own_id,
   acc_firm_id
 }));
 const all_account_requests = [...cr_account_requests, ...dr_account_requests];
-
 create_multiple_account(all_account_requests);
 
 }

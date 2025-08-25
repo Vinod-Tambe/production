@@ -6,6 +6,9 @@ const createFirmSchema = Joi.object({
     "string.empty": "Firm name is required",
     "any.required": "Firm name is required",
   }),
+    firm_start_date: Joi.string().allow("").required().messages({
+    "string.base": "IS Not Empty",
+  }),
 
   firm_reg_no: Joi.string().trim().required().messages({
     "string.empty": "Firm registration number is required",
