@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 const userSchema = new mongoose.Schema({
   user_id: { type: Number, unique: true, trim: true, default: "" },
-  user_add_date: { type: String,  default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
-    }},
+  user_add_date: { type: String,  default: Date.now,},
   user_firm_id: { type: Number, required: true, trim: true, default: "" },
   user_acc_id: { type: Number, required: true, trim: true, default: "" },
   user_own_id: { type: Number, required: true, trim: true, default: 0 },

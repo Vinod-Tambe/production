@@ -19,10 +19,7 @@ const journalTransSchema = new mongoose.Schema({
   },
   jrtr_add_date: {
     type: String,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
-    }
+    default: Date.now,
   },
   jrtr_date: {
     type: String,

@@ -4,10 +4,7 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const firmSchema = new mongoose.Schema({
   firm_add_date: {
     type: String,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
-    }
+   default: Date.now,
   },
   firm_own_id: {
     type: Number,

@@ -9,10 +9,7 @@ const imageSchema = new mongoose.Schema({
   },
   img_add_date: {
     type: Date,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-');
-    }
+   default: Date.now,
   },
   img_name: {
     type: String,

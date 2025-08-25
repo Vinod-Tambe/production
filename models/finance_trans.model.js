@@ -24,10 +24,7 @@ const financeTransactionSchema = new mongoose.Schema({
   },
   ft_add_date: {
     type: String,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split("-").reverse().join("-");
-    },
+    default: Date.now,
   },
   ft_start_date: {
     type: String,
