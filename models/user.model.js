@@ -2,7 +2,21 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 const userSchema = new mongoose.Schema({
   user_id: { type: Number, unique: true, trim: true, default: "" },
-  user_add_date: { type: String,  default: Date.now,},
+user_add_date: {
+    type: String,
+    default: () => {
+      const now = new Date();
+      return now.toLocaleString("en-IN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+    },
+  },
   user_firm_id: { type: Number, required: true, trim: true, default: "" },
   user_acc_id: { type: Number, required: true, trim: true, default: "" },
   user_own_id: { type: Number, required: true, trim: true, default: 0 },

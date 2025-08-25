@@ -13,7 +13,6 @@ async function create_finance(data) {
         ft_own_id: result.fin_own_id,
         ft_user_id: result.fin_user_id,
         ft_fin_id: result.fin_id,
-        ft_add_date: result.fin_start_date,
         ft_emi_amt: result.fin_emi_amt,
         ft_paid_amt: 0,
         ft_pending_amt: result.fin_emi_amt,

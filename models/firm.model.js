@@ -4,7 +4,18 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const firmSchema = new mongoose.Schema({
   firm_add_date: {
     type: String,
-   default: Date.now,
+    default: () => {
+      const now = new Date();
+      return now.toLocaleString("en-IN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+    },
   },
   firm_own_id: {
     type: Number,

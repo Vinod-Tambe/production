@@ -4,7 +4,18 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const financeSchema = new mongoose.Schema({
   fin_add_date: {
     type: String,
-   default: Date.now,
+       default: () => {
+      const now = new Date();
+      return now.toLocaleString("en-IN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+    },
   },
   fin_own_id: {
     type: Number,
@@ -45,10 +56,6 @@ const financeSchema = new mongoose.Schema({
   fin_start_date: {
     type: String,
     required: true,
-    default: () => {
-      const now = new Date();
-      return now.toISOString().slice(0, 10).split('-').reverse().join('-'); // "DD-MM-YYYY"
-    }
   },
   fin_time_period: {
     type: String,
