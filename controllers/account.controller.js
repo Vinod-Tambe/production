@@ -66,7 +66,6 @@ exports.updateAccount = async (req, res) => {
   try {
       const ownerId = await getOwnerIdFromToken(req);
     req.body.acc_own_id = ownerId;
-    await createAccountSchema.validateAsync(req.body);
     const account = await accountService.update_account(req.params.id, req.body);
     if (!account) {
       return res.status(200).json({
