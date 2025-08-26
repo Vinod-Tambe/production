@@ -4,25 +4,25 @@ const get_all_daybook_entries = async (req, res) => {
   try {
     const { firmId, startDate, endDate } = req.query;
 
-    // Validate date format (DD-MM-YYYY) if provided
-    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    // Validate date format (YYYY-MM-DD) if provided
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (startDate && !dateRegex.test(startDate)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid start date format. Use DD-MM-YYYY",
+        message: "Invalid start date format. Use YYYY-MM-DD",
       });
     }
     if (endDate && !dateRegex.test(endDate)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid end date format. Use DD-MM-YYYY",
+        message: "Invalid end date format. Use YYYY-MM-DD",
       });
     }
 
     // Validate date range logic if both dates are provided
     if (startDate && endDate) {
-      const start = new Date(startDate.split("-").reverse().join("-"));
-      const end = new Date(endDate.split("-").reverse().join("-"));
+      const start = new Date(startDate + "T00:00:00.000Z");
+      const end = new Date(endDate + "T00:00:00.000Z");
       if (isNaN(start) || isNaN(end)) {
         return res.status(400).json({
           success: false,

@@ -53,16 +53,16 @@ const handleError = (error, title, colorClass, amtColor, isSummary = false) => {
 
 // Convert DD-MM-YYYY to string for string-based date queries
 const toDateString = (dateStr) => {
-  if (!dateStr || !dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-    throw new Error(`Invalid date format: ${dateStr}. Expected DD-MM-YYYY`);
+  if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    throw new Error(`Invalid date format: ${dateStr}. Expected YYYY-MM-DD`);
   }
   return dateStr;
 };
 
 // Calculate the date before the given startDate in DD-MM-YYYY format
 const getDateBefore = (dateStr) => {
-  if (!dateStr || !dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-    throw new Error(`Invalid date format: ${dateStr}. Expected DD-MM-YYYY`);
+  if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    throw new Error(`Invalid date format: ${dateStr}. Expected YYYY-MM-DD`);
   }
   const [day, month, year] = dateStr.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
@@ -227,7 +227,6 @@ const get_day_book_summary = async (filters = {}) => {
     if (filters.startDate) {
       financeQuery.fin_start_date = { $lt: toDateString(filters.startDate) };
     }
-
     // Query for Finance_Money_Transaction collection (PAID)
     const paidQuery = { fm_trans_type: "PAID" };
     if (filters.firmId) {
