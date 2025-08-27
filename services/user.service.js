@@ -124,10 +124,33 @@ const get_user_details = async (userId) => {
   return await User.findById(userId);
 };
 
+const get_user_full_name=async(userId)=> {
+try {
+    const user = await User.findOne({ user_id: userId }).select('user_name_prefix user_first_name user_middle_name user_last_name');
+    if (!user) {
+      console.log('No user found, returning fallback');
+      return '-';
+    }
+    const fullName = [
+      user.user_name_prefix,
+      user.user_first_name,
+      user.user_middle_name,
+      user.user_last_name
+    ]
+      .filter(Boolean)
+      .join(' ');
+    return fullName;
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    throw err; // Or return '-' if you prefer a fallback
+  }
+}
+
 module.exports = {
   create_user,
   update_user,
   delete_user,
   get_all_user,
-  get_user_details
+  get_user_details,
+  get_user_full_name
 };

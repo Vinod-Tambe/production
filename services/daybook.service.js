@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Finance = require("../models/finance.modal");
 const Finance_Money_Transaction = require("../models/finance_money_trans.model");
 const { get_acc_opening_balance } = require("./account.service");
+const { get_user_full_name } = require("./user.service");
 
 // Reusable function to format date as DD-MM-YYYY
 const formatDateToDDMMYYYY = (date) => {
@@ -21,13 +22,14 @@ const formatDateToDDMMYYYY = (date) => {
 };
 
 // Reusable function to map database records to response format
-const mapToResponse = (item) => {
+const mapToResponse = async (item) => {
   const toNumber = (value) => (parseFloat(value) || 0).toFixed(2);
-
+  const userId = item.fin_user_id || item.fm_user_id || "";
+  const customerName = userId ? await get_user_full_name(userId) : "-";
   return {
     db_date: formatDateToDDMMYYYY(item.fin_start_date || item.fm_trans_date),
     db_firm: item.fin_firm_id || item.fm_firm_id || "",
-    db_customer_name: item.fin_user_id || item.fm_user_id || "",
+    db_customer_name: customerName || "",
     db_cust_id: `C${item.fin_user_id || item.fm_user_id || ""}`,
     db_cash_amt: toNumber(item.fin_cash_amt || item.fm_cash_amt),
     db_bank_amt: toNumber(item.fin_bank_amt || item.fm_bank_amt),
@@ -65,7 +67,7 @@ const getDateBefore = (dateStr) => {
   if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
     throw new Error(`Invalid date format: ${dateStr}. Expected YYYY-MM-DD`);
   }
-  const [day, month, year] = dateStr.split("-").map(Number);
+  const [year, month, day] = dateStr.split("-").map(Number); // Fixed order to match YYYY-MM-DD
   const date = new Date(Date.UTC(year, month - 1, day));
   date.setUTCDate(date.getUTCDate() - 1);
   const prevDay = String(date.getUTCDate()).padStart(2, "0");
@@ -98,13 +100,15 @@ const get_add_new_finance_data = async (filters = {}) => {
     const financeRecords = await Finance.find(query)
       .select("fin_start_date fin_firm_id fin_user_id fin_cash_amt fin_bank_amt fin_online_amt fin_card_amt")
       .lean();
-      if (financeRecords.length <= 0) {  return 0}
+    if (financeRecords.length <= 0) {
+      return 0;
+    }
     return {
       title: "FINANCE ADDED",
       colorClass: "bg-green",
       amtColor: "text-danger",
       column: ["DATE", "FIRM", "CUSTOMER NAME", "CUST ID", "CASH", "BANK", "ONLINE", "CARD", "DISC"],
-      data: financeRecords.map(mapToResponse),
+      data: await Promise.all(financeRecords.map(mapToResponse)), // Use Promise.all to resolve async mapping
     };
   } catch (error) {
     return handleError(error, "FINANCE ADDED", "bg-green", "text-danger");
@@ -135,13 +139,15 @@ const get_finance_paid_emi_data = async (filters = {}) => {
     const paidRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-    if (paidRecords.length <= 0) { return 0 }
+    if (paidRecords.length <= 0) {
+      return 0;
+    }
     return {
       title: "FINANCE EMI DEPOSIT",
       colorClass: "bg-red",
       amtColor: "text-success",
       column: ["DATE", "FIRM", "CUSTOMER NAME", "CUST ID", "CASH", "BANK", "ONLINE", "CARD", "DISC"],
-      data: paidRecords.map(mapToResponse),
+      data: await Promise.all(paidRecords.map(mapToResponse)), // Use Promise.all to resolve async mapping
     };
   } catch (error) {
     return handleError(error, "FINANCE EMI DEPOSIT", "bg-red", "text-success");
@@ -172,13 +178,15 @@ const get_finance_rollback_emi_data = async (filters = {}) => {
     const rollbackRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-    if (rollbackRecords.length <= 0) { return 0 }
+    if (rollbackRecords.length <= 0) {
+      return 0;
+    }
     return {
       title: "FINANCE EMI ROLLBACK",
       colorClass: "bg-blue",
       amtColor: "text-danger",
       column: ["DATE", "FIRM", "CUSTOMER NAME", "CUST ID", "CASH", "BANK", "ONLINE", "CARD", "DISC"],
-      data: rollbackRecords.map(mapToResponse),
+      data: await Promise.all(rollbackRecords.map(mapToResponse)), // Use Promise.all to resolve async mapping
     };
   } catch (error) {
     return handleError(error, "FINANCE EMI ROLLBACK", "bg-blue", "text-danger");
@@ -207,7 +215,7 @@ const get_all_daybook_data = async (filters = {}) => {
     return { daybook_data: response_arr, summary: summaryData };
   } catch (error) {
     console.error("Error combining daybook data:", error);
-    return [];
+    return { daybook_data: [], summary: {} };
   }
 };
 
@@ -423,31 +431,35 @@ const get_day_book_summary = async (filters = {}) => {
         },
       ]),
     ]);
-    //get account opening balance
-     const all_opening_balance_acc=await get_acc_opening_balance(filters.firmId, filters.startDate);
-     const acc_cash_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Cash In Hand') || {}).acc_cash_balance || 0;
-     const acc_bank_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Bank Account') || {}).acc_cash_balance || 0;
-     const acc_online_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Online Account') || {}).acc_cash_balance || 0;
-     const acc_card_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Card Account') || {}).acc_cash_balance || 0;
-    //get account opening balance
+
+    // Get account opening balance
+    const all_opening_balance_acc = await get_acc_opening_balance(filters.firmId, filters.startDate);
+    const acc_cash_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Cash In Hand') || {}).acc_cash_balance || 0;
+    const acc_bank_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Bank Account') || {}).acc_cash_balance || 0;
+    const acc_online_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Online Account') || {}).acc_cash_balance || 0;
+    const acc_card_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Card Account') || {}).acc_cash_balance || 0;
 
     // Format totals to two decimal places
     const toNumber = (value) => (parseFloat(value) || 0).toFixed(2);
 
     // Calculate opening balances
-    const cash_open_amt =  toNumber(parseFloat(acc_cash_opening_bal)+
+    const cash_open_amt = toNumber(
+      parseFloat(acc_cash_opening_bal) +
       (parseFloat(finance_emi_paid_data[0]?.total_cash_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_cash_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_cash_amt || 0))
     );
-    const bank_open_amt =toNumber(parseFloat(acc_bank_opening_bal)+
+    const bank_open_amt = toNumber(
+      parseFloat(acc_bank_opening_bal) +
       (parseFloat(finance_emi_paid_data[0]?.total_bank_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_bank_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_bank_amt || 0))
     );
-    const online_open_amt =toNumber( parseFloat(acc_online_opening_bal)+
+    const online_open_amt = toNumber(
+      parseFloat(acc_online_opening_bal) +
       (parseFloat(finance_emi_paid_data[0]?.total_online_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_online_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_online_amt || 0))
     );
-    const card_open_amt =toNumber(parseFloat(acc_card_opening_bal)+
+    const card_open_amt = toNumber(
+      parseFloat(acc_card_opening_bal) +
       (parseFloat(finance_emi_paid_data[0]?.total_card_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_card_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_card_amt || 0))
     );
