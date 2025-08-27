@@ -7,5 +7,6 @@ router.get("/get", controller.getAllAccounts);
 router.get("/get/:id", controller.getAccountById);
 router.put("/update/:id", controller.updateAccount);
 router.delete("/delete/:id", controller.deleteAccount);
+router.get("/ledger", controller.get_account_ledger);
 
 module.exports = router;

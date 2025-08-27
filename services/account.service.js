@@ -47,7 +47,7 @@ exports.update_account = async (id, updateData) => {
     { new: true }
   );
 };
-exports.get_acc_opening_balance = async (firmId='N', startDate) => {
+exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
   try {
     const query = {
       acc_cash_balance: { $ne: 0 },
@@ -56,7 +56,10 @@ exports.get_acc_opening_balance = async (firmId='N', startDate) => {
     if (firmId !== 'N') {
       query.acc_firm_id = firmId;
     }
-    const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type');
+    if (accId !== 'N') {
+      query.acc_id = accId;
+    }
+    const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id');
     return accounts;
   } catch (error) {
     console.error("Error fetching accounts:", error);

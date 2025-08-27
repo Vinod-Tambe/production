@@ -27,11 +27,11 @@ async function create_finance(data) {
         "jrnl_user_id": result.fin_user_id, "jrnl_amt": result.fin_final_amt, "jrnl_panel": "Finance", "jrnl_other_info": `Add New Finance : Fin No - ${result.fin_id}`
       },
       "joural_trans_data": [
-        { "jrtr_crdr": "CR", "jrtr_cr_acc_id": result.fin_cash_acc_id, "jrtr_cr_amt": result.fin_cash_amt, "jrtr_acc_info": result.fin_cash_info },
-        { "jrtr_crdr": "CR", "jrtr_cr_acc_id": result.fin_bank_acc_id, "jrtr_cr_amt": result.fin_bank_amt, "jrtr_acc_info": result.fin_bank_info },
-        { "jrtr_crdr": "CR", "jrtr_cr_acc_id": result.fin_online_acc_id, "jrtr_cr_amt": result.fin_online_amt, "jrtr_acc_info": result.fin_online_info },
-        { "jrtr_crdr": "CR", "jrtr_cr_acc_id": result.fin_card_acc_id, "jrtr_cr_amt": result.fin_card_amt, "jrtr_acc_info": result.fin_card_info },
-        { "jrtr_crdr": "DR", "jrtr_dr_acc_id": result.fin_dr_acc_id, "jrtr_dr_amt": result.fin_final_amt, "jrtr_acc_info": `Add New Finance : Fin No - ${result.fin_id}` }
+        { "jrtr_crdr": "CR","jrtr_date": result.fin_start_date, "jrtr_cr_acc_id": result.fin_cash_acc_id, "jrtr_cr_amt": result.fin_cash_amt, "jrtr_acc_info": result.fin_cash_info },
+        { "jrtr_crdr": "CR","jrtr_date": result.fin_start_date, "jrtr_cr_acc_id": result.fin_bank_acc_id, "jrtr_cr_amt": result.fin_bank_amt, "jrtr_acc_info": result.fin_bank_info },
+        { "jrtr_crdr": "CR","jrtr_date": result.fin_start_date, "jrtr_cr_acc_id": result.fin_online_acc_id, "jrtr_cr_amt": result.fin_online_amt, "jrtr_acc_info": result.fin_online_info },
+        { "jrtr_crdr": "CR","jrtr_date": result.fin_start_date, "jrtr_cr_acc_id": result.fin_card_acc_id, "jrtr_cr_amt": result.fin_card_amt, "jrtr_acc_info": result.fin_card_info },
+        { "jrtr_crdr": "DR","jrtr_date": result.fin_start_date, "jrtr_dr_acc_id": result.fin_dr_acc_id, "jrtr_dr_amt": result.fin_final_amt, "jrtr_acc_info": `Add New Finance : Fin No - ${result.fin_id}` }
       ]
     }
     const jrnl_id = await create_journal_entry(jornal_request);
