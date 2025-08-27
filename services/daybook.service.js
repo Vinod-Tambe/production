@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Finance = require("../models/finance.modal");
 const Finance_Money_Transaction = require("../models/finance_money_trans.model");
+const { get_acc_opening_balance } = require("./account.service");
 
 // Reusable function to format date as DD-MM-YYYY
 const formatDateToDDMMYYYY = (date) => {
@@ -134,7 +135,7 @@ const get_finance_paid_emi_data = async (filters = {}) => {
     const paidRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-     if (paidRecords.length <= 0) {  return 0}
+    if (paidRecords.length <= 0) { return 0 }
     return {
       title: "FINANCE EMI DEPOSIT",
       colorClass: "bg-red",
@@ -171,7 +172,7 @@ const get_finance_rollback_emi_data = async (filters = {}) => {
     const rollbackRecords = await Finance_Money_Transaction.find(query)
       .select("fm_trans_date fm_firm_id fm_user_id fm_trans_amt fm_cash_amt fm_bank_amt fm_online_amt fm_card_amt")
       .lean();
-     if (rollbackRecords.length <= 0) {  return 0}
+    if (rollbackRecords.length <= 0) { return 0 }
     return {
       title: "FINANCE EMI ROLLBACK",
       colorClass: "bg-blue",
@@ -193,20 +194,17 @@ const get_all_daybook_data = async (filters = {}) => {
       get_finance_rollback_emi_data(filters),
       get_day_book_summary(filters),
     ]);
-    let response_arr=[];
-    if(financeData!==0)
-    {
+    let response_arr = [];
+    if (financeData !== 0) {
       response_arr.push(financeData);
     }
-    if(paidEmiData!==0)
-    {
+    if (paidEmiData !== 0) {
       response_arr.push(paidEmiData);
     }
-    if(rollbackEmiData!==0)
-    {
+    if (rollbackEmiData !== 0) {
       response_arr.push(rollbackEmiData);
     }
-    return {daybook_data:response_arr,summary:summaryData};
+    return { daybook_data: response_arr, summary: summaryData };
   } catch (error) {
     console.error("Error combining daybook data:", error);
     return [];
@@ -425,24 +423,31 @@ const get_day_book_summary = async (filters = {}) => {
         },
       ]),
     ]);
+    //get account opening balance
+     const all_opening_balance_acc=await get_acc_opening_balance(filters.firmId, filters.startDate);
+     const acc_cash_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Cash In Hand') || {}).acc_cash_balance || 0;
+     const acc_bank_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Bank Account') || {}).acc_cash_balance || 0;
+     const acc_online_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Online Account') || {}).acc_cash_balance || 0;
+     const acc_card_opening_bal = (all_opening_balance_acc.find(a => a.acc_name === 'Card Account') || {}).acc_cash_balance || 0;
+    //get account opening balance
 
     // Format totals to two decimal places
     const toNumber = (value) => (parseFloat(value) || 0).toFixed(2);
 
     // Calculate opening balances
-    const cash_open_amt = toNumber(
+    const cash_open_amt =  toNumber(parseFloat(acc_cash_opening_bal)+
       (parseFloat(finance_emi_paid_data[0]?.total_cash_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_cash_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_cash_amt || 0))
     );
-    const bank_open_amt = toNumber(
+    const bank_open_amt =toNumber(parseFloat(acc_bank_opening_bal)+
       (parseFloat(finance_emi_paid_data[0]?.total_bank_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_bank_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_bank_amt || 0))
     );
-    const online_open_amt = toNumber(
+    const online_open_amt =toNumber( parseFloat(acc_online_opening_bal)+
       (parseFloat(finance_emi_paid_data[0]?.total_online_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_online_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_online_amt || 0))
     );
-    const card_open_amt = toNumber(
+    const card_open_amt =toNumber(parseFloat(acc_card_opening_bal)+
       (parseFloat(finance_emi_paid_data[0]?.total_card_amt || 0)) -
       (parseFloat(finance_add_data[0]?.total_card_amt || 0) + parseFloat(finance_emi_rollback_data[0]?.total_card_amt || 0))
     );
@@ -451,12 +456,12 @@ const get_day_book_summary = async (filters = {}) => {
     );
 
     return {
-          type: "OPENING BALANCE",
-          total_cash_amt: cash_open_amt,
-          total_bank_amt: bank_open_amt,
-          total_online_amt: online_open_amt,
-          total_card_amt: card_open_amt,
-          total_open_amt: total_open_amt,
+      type: "OPENING BALANCE",
+      total_cash_amt: cash_open_amt,
+      total_bank_amt: bank_open_amt,
+      total_online_amt: online_open_amt,
+      total_card_amt: card_open_amt,
+      total_open_amt: total_open_amt,
     };
   } catch (error) {
     return handleError(error, "DAYBOOK SUMMARY", "bg-purple", "text-primary", true);

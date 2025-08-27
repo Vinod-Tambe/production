@@ -47,6 +47,22 @@ exports.update_account = async (id, updateData) => {
     { new: true }
   );
 };
+exports.get_acc_opening_balance = async (firmId='N', startDate) => {
+  try {
+    const query = {
+      acc_cash_balance: { $ne: 0 },
+      acc_opening_date: { $lte: startDate },
+    };
+    if (firmId !== 'N') {
+      query.acc_firm_id = firmId;
+    }
+    const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type');
+    return accounts;
+  } catch (error) {
+    console.error("Error fetching accounts:", error);
+    throw error;
+  }
+}
 
 exports.get_all_account = async () => {
   return await Account.find();
