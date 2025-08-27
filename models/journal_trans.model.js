@@ -53,11 +53,11 @@ const journalTransSchema = new mongoose.Schema({
     type: Number,
   },
   jrtr_cr_amt: {
-    type: [Number, String],
+    type:String,
     required: true
   },
   jrtr_dr_amt: {
-    type: [Number, String],
+    type: String,
     required: true
   },
   jrtr_acc_info: {

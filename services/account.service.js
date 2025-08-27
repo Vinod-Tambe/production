@@ -59,7 +59,7 @@ exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
     if (accId !== 'N') {
       query.acc_id = accId;
     }
-    const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id');
+    const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id acc_pre_acc');
     return accounts;
   } catch (error) {
     console.error("Error fetching accounts:", error);
