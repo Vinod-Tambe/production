@@ -24,7 +24,7 @@ async function create_finance(data) {
     const jornal_request = {
       "journal_date": {
         "jrnl_date": result.fin_start_date, "jrnl_firm_id": result.fin_firm_id, "jrnl_own_id": result.fin_own_id,
-        "jrnl_user_id": result.fin_user_id, "jrnl_amt": result.fin_final_amt, "jrnl_panel": "Finance", "jrnl_other_info": `Add New Finance : Fin No - ${result.fin_id}`
+        "jrnl_user_id": result.fin_user_id, "jrnl_amt": result.fin_final_amt, "jrnl_panel": "Finance", "jrnl_other_info": `Add New Finance | Fin No - ${result.fin_id}`
       },
       "joural_trans_data": [
         { "jrtr_crdr": "CR","jrtr_date": result.fin_start_date, "jrtr_cr_acc_id": result.fin_cash_acc_id, "jrtr_cr_amt": result.fin_cash_amt, "jrtr_acc_info": result.fin_cash_info },

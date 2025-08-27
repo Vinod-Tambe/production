@@ -50,7 +50,6 @@ exports.update_account = async (id, updateData) => {
 exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
   try {
     const query = {
-      acc_cash_balance: { $ne: 0 },
       acc_opening_date: { $lte: startDate },
     };
     if (firmId !== 'N') {
@@ -58,6 +57,8 @@ exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
     }
     if (accId !== 'N') {
       query.acc_id = accId;
+    }else{
+       query.acc_cash_balance= { $ne: 0 }
     }
     const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id acc_pre_acc');
     return accounts;
