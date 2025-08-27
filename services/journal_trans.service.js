@@ -8,7 +8,6 @@ async function create_journal_trans_entry(entries) {
         if (!Array.isArray(entries) || entries.length === 0) {
             throw new Error('Input must be a non-empty array.');
         }
-
         const inserted = await JournalTrans.insertMany(entries);
         return inserted;
     } catch (err) {

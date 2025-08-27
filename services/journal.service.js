@@ -59,12 +59,6 @@ const make_journal_request = async (inputData,jrnl_id) => {
       );
     }
 
-    // Convert jrnl_date to Date object
-    const parsedDate = new Date(jrnl_date);
-    if (isNaN(parsedDate)) {
-      throw new Error('Invalid jrnl_date format');
-    }
-
     // Process transactions in a single loop
     const transactions = inputData.joural_trans_data || [];
     const updatedTransactions = [];
@@ -80,7 +74,7 @@ const make_journal_request = async (inputData,jrnl_id) => {
       if (!isValid) continue;
 
       updatedTransactions.push({
-        jrtr_date: parsedDate,
+        jrtr_date: jrnl_date,
         jrtr_firm_id: jrnl_firm_id,
         jrtr_own_id: jrnl_own_id,
         jrtr_jrnl_id: jrnl_id,
