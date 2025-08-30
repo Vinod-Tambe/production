@@ -27,7 +27,94 @@ async function delete_journal_trans_entry(jrtr_jrnl_id) {
     }
 }
 
+async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
+    try {
+        // Validate input dates
+        if (!start_date || !end_date || isNaN(new Date(start_date)) || isNaN(new Date(end_date))) {
+            throw new Error('Invalid start_date or end_date');
+        }
+
+        // Build match stage conditionally
+        const matchStage = {
+            jrtr_date: {
+                $gte: start_date, // Expects DD/MM/YYYY, e.g., '30/08/2025'
+                $lte: end_date,
+            },
+        };
+        if (firm_id !== 'N') {
+            matchStage.jrtr_firm_id = Number(firm_id);
+        }
+
+        // Test match stage
+        const matchedDocs = await JournalTrans.find(matchStage)
+            .select('jrtr_id jrtr_cr_acc_id jrtr_dr_acc_id jrtr_cr_amt jrtr_dr_amt jrtr_date')
+
+        // Aggregation pipeline
+        const result = await JournalTrans.aggregate([
+            { $match: matchStage },
+            {
+                $facet: {
+                    credit: [
+                        {
+                            $group: {
+                                _id: { $ifNull: ["$jrtr_cr_acc_id", "$jrtr_dr_acc_id"] },
+                                total_cr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_cr_amt", "0"] } } },
+                            },
+                        },
+                    ],
+                    debit: [
+                        {
+                            $group: {
+                                _id: { $ifNull: ["$jrtr_dr_acc_id", "$jrtr_cr_acc_id"] },
+                                total_dr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_dr_amt", "0"] } } },
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $project: {
+                    combined: { $concatArrays: ["$credit", "$debit"] },
+                },
+            },
+            { $unwind: "$combined" },
+            {
+                $group: {
+                    _id: "$combined._id",
+                    total_cr_amt: { $sum: "$combined.total_cr_amt" },
+                    total_dr_amt: { $sum: "$combined.total_dr_amt" },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    account: {
+                        $arrayToObject: [
+                            [
+                                {
+                                    k: { $toString: "$_id" },
+                                    v: {
+                                        total_cr_amt: { $round: ["$total_cr_amt", 2] },
+                                        total_dr_amt: { $round: ["$total_dr_amt", 2] },
+                                    },
+                                },
+                            ],
+                        ],
+                    },
+                },
+            },
+            { $replaceRoot: { newRoot: "$account" } },
+        ]);
+
+        return result;
+    } catch (error) {
+        console.error('Error in get_all_acc_journal_trans:', error);
+        throw error;
+    }
+}
+
 module.exports = {
+    get_all_acc_journal_trans,
     create_journal_trans_entry,
     delete_journal_trans_entry
 };
