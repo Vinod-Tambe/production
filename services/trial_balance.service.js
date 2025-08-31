@@ -90,8 +90,7 @@ const get_all_trial_balance_data = async (filters = {}) => {
             entry.total_cr_amt += journal.total_cr_amt || 0;
             entry.total_dr_amt += journal.total_dr_amt || 0;
             entry.total_cr_amt=0-entry.total_cr_amt;
-            entry.total_dr_amt=0-entry.total_dr_amt;
-            entry.acc_close_balance = entry.acc_open_balance + entry.total_dr_amt + entry.total_cr_amt;
+            entry.acc_close_balance = (entry.acc_open_balance + entry.total_dr_amt) - Math.abs(entry.total_cr_amt);
         }
 
         // Convert Map to array for output
