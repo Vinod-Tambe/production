@@ -47,7 +47,7 @@ exports.update_account = async (id, updateData) => {
     { new: true }
   );
 };
-exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
+exports.get_acc_opening_balance = async (firmId = 'N', startDate, accId = "N") => {
   try {
     const query = {
       acc_opening_date: { $lte: startDate },
@@ -57,8 +57,8 @@ exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
     }
     if (accId !== 'N') {
       query.acc_id = accId;
-    }else{
-       query.acc_cash_balance= { $ne: 0 }
+    } else {
+      query.acc_cash_balance = { $ne: 0 }
     }
     const accounts = await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id acc_pre_acc');
     return accounts;
@@ -68,8 +68,12 @@ exports.get_acc_opening_balance = async (firmId='N', startDate,accId="N") => {
   }
 }
 
-exports.get_all_account = async () => {
-  return await Account.find();
+exports.get_all_account = async (firm_id = 'N') => {
+  var query = {};
+  if (firm_id != "N") {
+    query.acc_firm_id = firm_id
+  }
+  return await Account.find(query).select('acc_cash_balance acc_name acc_firm_id acc_balance_type acc_id acc_pre_acc');
 };
 
 exports.get_account_by_id = async (id) => {

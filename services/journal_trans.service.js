@@ -27,29 +27,23 @@ async function delete_journal_trans_entry(jrtr_jrnl_id) {
     }
 }
 
-async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
+async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = null) {
     try {
-        // Validate input dates
-        if (!start_date || !end_date || isNaN(new Date(start_date)) || isNaN(new Date(end_date))) {
-            throw new Error('Invalid start_date or end_date');
+        if (!end_date || isNaN(new Date(end_date))) {
+            throw new Error('Invalid or missing end_date');
         }
 
-        // Build match stage conditionally
         const matchStage = {
-            jrtr_date: {
-                $gte: start_date, // Expects DD/MM/YYYY, e.g., '30/08/2025'
-                $lte: end_date,
-            },
+            jrtr_date: { $lte: end_date },
         };
-        if (firm_id !== 'N') {
+        
+        if (start_date && !isNaN(new Date(start_date))) {
+            matchStage.jrtr_date.$gte = start_date;
+        }
+
+        if (firm_id && firm_id !== 'N') {
             matchStage.jrtr_firm_id = Number(firm_id);
         }
-
-        // Test match stage
-        const matchedDocs = await JournalTrans.find(matchStage)
-            .select('jrtr_id jrtr_cr_acc_id jrtr_dr_acc_id jrtr_cr_amt jrtr_dr_amt jrtr_date')
-
-        // Aggregation pipeline
         const result = await JournalTrans.aggregate([
             { $match: matchStage },
             {
@@ -58,7 +52,7 @@ async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
                         {
                             $group: {
                                 _id: { $ifNull: ["$jrtr_cr_acc_id", "$jrtr_dr_acc_id"] },
-                                total_cr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_cr_amt", "0"] } } },
+                                total_cr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_cr_amt", 0] } } },
                             },
                         },
                     ],
@@ -66,7 +60,7 @@ async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
                         {
                             $group: {
                                 _id: { $ifNull: ["$jrtr_dr_acc_id", "$jrtr_cr_acc_id"] },
-                                total_dr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_dr_amt", "0"] } } },
+                                total_dr_amt: { $sum: { $toDouble: { $ifNull: ["$jrtr_dr_amt", 0] } } },
                             },
                         },
                     ],
@@ -74,6 +68,7 @@ async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
             },
             {
                 $project: {
+        
                     combined: { $concatArrays: ["$credit", "$debit"] },
                 },
             },
@@ -88,22 +83,11 @@ async function get_all_acc_journal_trans(start_date, end_date, firm_id = 'N') {
             {
                 $project: {
                     _id: 0,
-                    account: {
-                        $arrayToObject: [
-                            [
-                                {
-                                    k: { $toString: "$_id" },
-                                    v: {
-                                        total_cr_amt: { $round: ["$total_cr_amt", 2] },
-                                        total_dr_amt: { $round: ["$total_dr_amt", 2] },
-                                    },
-                                },
-                            ],
-                        ],
-                    },
+                    acc_id: { $toString: "$_id" },
+                    total_cr_amt: { $round: ["$total_cr_amt", 2] },
+                    total_dr_amt: { $round: ["$total_dr_amt", 2] },
                 },
             },
-            { $replaceRoot: { newRoot: "$account" } },
         ]);
 
         return result;
