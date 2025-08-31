@@ -4,8 +4,8 @@ const { get_all_acc_journal_trans } = require("./journal_trans.service");
 const get_all_trial_balance_data = async (filters = {}) => {
     try {
         // Validate inputs
-        if (!filters.firmId || !filters.startDate || !filters.endDate) {
-            throw new Error("Missing required filters: firmId, startDate, or endDate");
+        if ( !filters.startDate || !filters.endDate) {
+            throw new Error("Missing required filters: startDate, or endDate");
         }
 
         // Calculate previous day for startDate
@@ -29,7 +29,10 @@ const get_all_trial_balance_data = async (filters = {}) => {
         // Process opening balances
         for (const acc of openingBalances) {
             const accId = Number(acc.acc_id);
-            const accOpenBalance = acc.acc_cash_balance || 0;
+            let accOpenBalance = acc.acc_cash_balance || 0;
+            if (acc.acc_balance_type === 'CR') {
+                accOpenBalance = 0 - accOpenBalance;
+            }
             trialBalanceMap.set(accId, {
                 acc_name: acc.acc_name || 'Unknown',
                 acc_open_balance: accOpenBalance,
@@ -86,7 +89,9 @@ const get_all_trial_balance_data = async (filters = {}) => {
             // Update totals
             entry.total_cr_amt += journal.total_cr_amt || 0;
             entry.total_dr_amt += journal.total_dr_amt || 0;
-            entry.acc_close_balance = entry.acc_open_balance + entry.total_dr_amt - entry.total_cr_amt;
+            entry.total_cr_amt=0-entry.total_cr_amt;
+            entry.total_dr_amt=0-entry.total_dr_amt;
+            entry.acc_close_balance = entry.acc_open_balance + entry.total_dr_amt + entry.total_cr_amt;
         }
 
         // Convert Map to array for output
