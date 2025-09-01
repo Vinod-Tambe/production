@@ -27,7 +27,7 @@ async function delete_journal_trans_entry(jrtr_jrnl_id) {
     }
 }
 
-async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = null) {
+async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = null, acc_id = 'N') {
     try {
         if (!end_date || isNaN(new Date(end_date))) {
             throw new Error('Invalid or missing end_date');
@@ -36,9 +36,15 @@ async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = 
         const matchStage = {
             jrtr_date: { $lte: end_date },
         };
-        
+
         if (start_date && !isNaN(new Date(start_date))) {
             matchStage.jrtr_date.$gte = start_date;
+        }
+        if (acc_id !== 'N') {
+            matchStage.$or = [
+                { jrtr_cr_acc_id: acc_id },
+                { jrtr_dr_acc_id: acc_id }
+            ];
         }
 
         if (firm_id && firm_id !== 'N') {
@@ -68,7 +74,7 @@ async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = 
             },
             {
                 $project: {
-        
+
                     combined: { $concatArrays: ["$credit", "$debit"] },
                 },
             },
