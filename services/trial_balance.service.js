@@ -4,7 +4,7 @@ const { get_all_acc_journal_trans } = require("./journal_trans.service");
 const get_all_trial_balance_data = async (filters = {}) => {
     try {
         // Validate inputs
-        if ( !filters.startDate || !filters.endDate) {
+        if (!filters.startDate || !filters.endDate) {
             throw new Error("Missing required filters: startDate, or endDate");
         }
 
@@ -89,16 +89,22 @@ const get_all_trial_balance_data = async (filters = {}) => {
             // Update totals
             entry.total_cr_amt += journal.total_cr_amt || 0;
             entry.total_dr_amt += journal.total_dr_amt || 0;
-            entry.total_cr_amt=0-entry.total_cr_amt;
+            entry.total_cr_amt = 0 - entry.total_cr_amt;
             entry.acc_close_balance = (entry.acc_open_balance + entry.total_dr_amt) - Math.abs(entry.total_cr_amt);
         }
 
         // Convert Map to array for output
-        return Array.from(trialBalanceMap.values());
-    } catch (error) {
-        console.error('Error in get_all_trial_balance_data:', error);
-        throw error;
-    }
-};
+        for (const [key, value] of trialBalanceMap.entries()) {
+            const checkamt=value.acc_open_balance+value.total_cr_amt+value.total_dr_amt+value.acc_close_balance;
+            if (checkamt === 0) {   // 👈 put your condition here
+                trialBalanceMap.delete(key);
+            }
+        }
+            return Array.from(trialBalanceMap.values());
+        } catch (error) {
+            console.error('Error in get_all_trial_balance_data:', error);
+            throw error;
+        }
+    };
 
-module.exports = { get_all_trial_balance_data };
+    module.exports = { get_all_trial_balance_data };
