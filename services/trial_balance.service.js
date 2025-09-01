@@ -89,12 +89,11 @@ const get_all_trial_balance_data = async (filters = {}) => {
             entry.total_cr_amt += journal.total_cr_amt || 0;
             entry.total_dr_amt += journal.total_dr_amt || 0;
             entry.total_cr_amt = 0 - entry.total_cr_amt;
-            entry.acc_close_balance = (entry.acc_open_balance + entry.total_dr_amt) - Math.abs(entry.total_cr_amt);
         }
 
         // Convert Map to array for output
         for (const [key, value] of trialBalanceMap.entries()) {
-            value.acc_close_balance=(value.acc_open_balance+value.total_dr_amt)-value.total_cr_amt;
+            value.acc_close_balance=(value.acc_open_balance+value.total_dr_amt)-(Math.abs(value.total_cr_amt));
             if (value.acc_open_balance === 0 && value.total_cr_amt===0 && value.total_dr_amt===0 && value.acc_close_balance===0) {   // 👈 put your condition here
                 trialBalanceMap.delete(key);
             }
