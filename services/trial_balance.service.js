@@ -95,8 +95,7 @@ const get_all_trial_balance_data = async (filters = {}) => {
 
         // Convert Map to array for output
         for (const [key, value] of trialBalanceMap.entries()) {
-            const checkamt=value.acc_open_balance+value.total_cr_amt+value.total_dr_amt+value.acc_close_balance;
-            if (checkamt === 0) {   // 👈 put your condition here
+            if (value.acc_open_balance === 0 && value.total_cr_amt===0 && value.total_dr_amt===0 && value.acc_close_balance===0) {   // 👈 put your condition here
                 trialBalanceMap.delete(key);
             }
         }
