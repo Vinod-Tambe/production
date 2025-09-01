@@ -9,7 +9,7 @@ const get_all_trial_balance_data = async (filters = {}) => {
         }
 
         // Calculate previous day for startDate
-        const get_end_date = new Date(new Date(filters.endDate).setDate(new Date(filters.endDate).getDate() - 1)).toISOString().split('T')[0];
+        const get_end_date = new Date(new Date(filters.startDate).setDate(new Date(filters.startDate).getDate() - 1)).toISOString().split('T')[0];
         // Fetch data concurrently
         const [previousDayClosing, openingBalances, accounts, journalTransactions] = await Promise.all([
             get_all_acc_journal_trans(null, get_end_date, filters.firmId),
@@ -51,8 +51,7 @@ const get_all_trial_balance_data = async (filters = {}) => {
 
             if (entry) {
                 // Update existing entry with previous day's closing balance as opening balance
-                entry.acc_open_balance += previousDayBalance;
-                entry.acc_close_balance += previousDayBalance; // Will be updated later with journal transactions
+                entry.acc_open_balance =entry.acc_open_balance+ previousDayBalance;
             } else {
                 // Create new entry if account not in opening balances
                 const account = accountMap.get(accId) || { acc_name: 'Not found', acc_cash_balance: 0 };
