@@ -53,5 +53,8 @@ app.use("/daybook", daybookRouters);
 const trial_balanceRouters = require("./routes/trial_balance.route.js");
 app.use("/trialbalance", trial_balanceRouters);
 
+const balance_sheetRouters = require("./routes/balance_sheet.route.js");
+app.use("/balancesheet", balance_sheetRouters);
+
 // ✅ Export only once at the end
 module.exports = app;

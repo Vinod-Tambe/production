@@ -27,7 +27,7 @@ async function delete_journal_trans_entry(jrtr_jrnl_id) {
     }
 }
 
-async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = null, acc_id = 'N') {
+async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = null, acc_id = 'N', acc_pre_acc_arr = 'N') {
     try {
         if (!end_date || isNaN(new Date(end_date))) {
             throw new Error('Invalid or missing end_date');
@@ -45,6 +45,9 @@ async function get_all_acc_journal_trans(start_date = null, end_date, firm_id = 
                 { jrtr_cr_acc_id: acc_id },
                 { jrtr_dr_acc_id: acc_id }
             ];
+        }
+        if (Array.isArray(acc_pre_acc_arr) && acc_pre_acc_arr.length > 0) {
+            matchStage.acc_pre_acc= { $in: acc_pre_acc_arr };
         }
 
         if (firm_id && firm_id !== 'N') {
