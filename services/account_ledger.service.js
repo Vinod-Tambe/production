@@ -1,7 +1,7 @@
 const { get_acc_opening_balance } = require("./account.service");
 const JournalTrans = require('../models/journal_trans.model');
 const { get_all_acc_journal_trans } = require("./journal_trans.service");
-const get_journal_trans_entries = async (startDate,endDate,acc_id,firm_id="N") => {
+const get_journal_trans_entries = async (startDate, endDate, acc_id, firm_id = "N") => {
 
     const query = {
         jrtr_date: {
@@ -28,14 +28,14 @@ const get_account_ledger_details = async (filters = {}) => {
     const acc_balance_type = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_balance_type || "CR";
     const acc_name = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_name || "";
     const acc_pre_acc = (get_acc_details.find(a => a.acc_id === Number(filters.ascc_id)) || {}).acc_pre_acc || "";
-    const journal_trans_data = await get_journal_trans_entries(filters.startDate,filters.endDate,filters.acc_id,filters.firmId);
+    const journal_trans_data = await get_journal_trans_entries(filters.startDate, filters.endDate, filters.acc_id, filters.firmId);
     const get_end_date = new Date(new Date(filters.startDate).setDate(new Date(filters.startDate).getDate() - 1)).toISOString().split('T')[0];
-    const previousDayClosing=await get_all_acc_journal_trans(null, get_end_date, filters.firmId,Number(filters.acc_id));
-    const total_pre_cr_amt=previousDayClosing[0].total_cr_amt;
-    const total_pre_dr_amt=previousDayClosing[0].total_dr_amt;
+    const previousDayClosing = await get_all_acc_journal_trans(null, get_end_date, filters.firmId, Number(filters.acc_id));
+    const total_pre_cr_amt = previousDayClosing?.[0]?.total_cr_amt || 0;
+    const total_pre_dr_amt = previousDayClosing?.[0]?.total_dr_amt || 0;
     const response = {
-        acc_open_balanace: (get_opening_balance+total_pre_dr_amt)-total_pre_cr_amt,
-        acc_balance_type:acc_balance_type,
+        acc_open_balanace: (get_opening_balance + total_pre_dr_amt) - total_pre_cr_amt,
+        acc_balance_type: acc_balance_type,
         acc_name: acc_name,
         acc_pre_acc: acc_pre_acc,
         jurnal_trans_data: journal_trans_data || [],
