@@ -27,7 +27,7 @@ const get_account_ledger_details = async (filters = {}) => {
     const get_opening_balance = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_cash_balance || 0;
     const acc_balance_type = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_balance_type || "CR";
     const acc_name = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_name || "";
-    const acc_pre_acc = (get_acc_details.find(a => a.acc_id === Number(filters.ascc_id)) || {}).acc_pre_acc || "";
+    const acc_pre_acc = (get_acc_details.find(a => a.acc_id === Number(filters.acc_id)) || {}).acc_pre_acc || "";
     const journal_trans_data = await get_journal_trans_entries(filters.startDate, filters.endDate, filters.acc_id, filters.firmId);
     const get_end_date = new Date(new Date(filters.startDate).setDate(new Date(filters.startDate).getDate() - 1)).toISOString().split('T')[0];
     const previousDayClosing = await get_all_acc_journal_trans(null, get_end_date, filters.firmId, Number(filters.acc_id));
