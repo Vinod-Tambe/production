@@ -97,24 +97,24 @@ const get_all_balance_sheet_data = async (filters = {}) => {
 
         const liabilityGroups = [
             "Capital Account",
-            "Loans",
+            "Loans (Liability)",
             "Reserves & Surplus",
             "Sundry Creditors",
             "Duties & Taxes",
             "Provisions",
             "Suspense Account",
-            "Branch/Divisions" // sometimes under liabilities
+            "Branch/Divisions"
         ];
 
         const assetGroups = [
             "Bank Accounts",
-            "Cash In Hand",
-            "Deposits",
+            "Cash-in-Hand",
+            "Deposits (Asset)",
             "Fixed Assets",
             "Investments",
-            "Loans & Advances",
-            "Misc. Expenses",
-            "Stock In Hand",
+            "Loans & Advances (Asset)",
+            "Misc. Expenses (Asset)",
+            "Stock-in-Hand",
             "Sundry Debtors"
         ];
         // Convert Map to aggregated objects
