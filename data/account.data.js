@@ -4,8 +4,8 @@ const cr_accounts = [
   { acc_name: "Branch/Divisions", acc_pre_acc: "Branch/Divisions" },
   { acc_name: "Suspense Account", acc_pre_acc: "Suspense Account" },
   { acc_name: "Duties & Taxes", acc_pre_acc: "Duties & Taxes" },
-  { acc_name: "Secured Loans", acc_pre_acc: "Loans (Liability)" },
-  { acc_name: "Unsecured Loans", acc_pre_acc: "Loans (Liability)" },
+  { acc_name: "Secured Loans", acc_pre_acc: "Loans" },
+  { acc_name: "Unsecured Loans", acc_pre_acc: "Loans" },
   { acc_name: "Provisions", acc_pre_acc: "Provisions" },
   { acc_name: "Reserves & Surplus", acc_pre_acc: "Reserves & Surplus" },
   { acc_name: "Sundry Creditors", acc_pre_acc: "Sundry Creditors" }
@@ -15,8 +15,8 @@ const dr_accounts = [
   { acc_name: "Bank Account", acc_pre_acc: "Bank Accounts" },
   { acc_name: "Card Account", acc_pre_acc: "Bank Accounts" },
   { acc_name: "Online Account", acc_pre_acc: "Bank Accounts" },
-  { acc_name: "Cash In Hand", acc_pre_acc: "Cash-in-Hand" },
-  { acc_name: "Deposits (Asset)", acc_pre_acc: "Deposits (Asset)" },
+  { acc_name: "Cash In Hand", acc_pre_acc: "Cash In Hand" },
+  { acc_name: "Deposits (Asset)", acc_pre_acc: "Deposits" },
   { acc_name: "Direct Expenses", acc_pre_acc: "Direct Expenses" },
   { acc_name: "Expenses (Direct)", acc_pre_acc: "Direct Expenses" },
   { acc_name: "Expenses (Indirect)", acc_pre_acc: "Indirect Expenses" },
@@ -26,10 +26,10 @@ const dr_accounts = [
   { acc_name: "Indirect Incomes", acc_pre_acc: "Indirect Incomes" },
   { acc_name: "Fixed Assets", acc_pre_acc: "Fixed Assets" },
   { acc_name: "Investments", acc_pre_acc: "Investments" },
-  { acc_name: "Loans & Advances", acc_pre_acc: "Loans & Advances (Asset)" },
-  { acc_name: "Misc Expenses", acc_pre_acc: "Misc. Expenses (Asset)" },
+  { acc_name: "Loans & Advances", acc_pre_acc: "Loans & Advances" },
+  { acc_name: "Misc Expenses", acc_pre_acc: "Misc. Expenses" },
   { acc_name: "Purchase Accounts", acc_pre_acc: "Purchase Accounts" },
-  { acc_name: "Stock In Hand", acc_pre_acc: "Stock-in-Hand" },
+  { acc_name: "Stock In Hand", acc_pre_acc: "Stock In Hand" },
   { acc_name: "Sundry Debtors", acc_pre_acc: "Sundry Debtors" }
 ];
 

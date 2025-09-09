@@ -96,14 +96,26 @@ const get_all_balance_sheet_data = async (filters = {}) => {
         const liabilitiesObj = {};
 
         const liabilityGroups = [
-            "Current Liabilities", "Capital Account", "Duties & Taxes", "Loans (Liability)",
-            "Provisions", "Reserves & Surplus", "Sundry Creditors", "Unsecured Loans", "Secured Loans"
+            "Capital Account",
+            "Loans",
+            "Reserves & Surplus",
+            "Sundry Creditors",
+            "Duties & Taxes",
+            "Provisions",
+            "Suspense Account",
+            "Branch/Divisions" // sometimes under liabilities
         ];
 
         const assetGroups = [
-            "Bank Od Account", "Current Assets", "Deposits (Asset)",
-            "Fixed Assets", "Investments", "Loans & Advances (Asset)", "Stock-In-Hand",
-            "Sundry Debtors", "Cash In Hand", "Bank Account", "Online Account", "Card Account"
+            "Bank Accounts",
+            "Cash In Hand",
+            "Deposits",
+            "Fixed Assets",
+            "Investments",
+            "Loans & Advances",
+            "Misc. Expenses",
+            "Stock In Hand",
+            "Sundry Debtors"
         ];
         // Convert Map to aggregated objects
         for (const [key, value] of trialBalanceMap.entries()) {
