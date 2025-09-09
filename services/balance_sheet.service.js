@@ -54,7 +54,7 @@ const get_all_balance_sheet_data = async (filters = {}) => {
                 entry.acc_open_balance = entry.acc_open_balance + previousDayBalance;
             } else {
                 // Create new entry if account not in opening balances
-                const account = accountMap.get(accId) || { acc_name: 'Not found',acc_pre_acc:'NOF', acc_cash_balance: 0 };
+                const account = accountMap.get(accId) || { acc_name: 'Not found', acc_pre_acc: 'NOF', acc_cash_balance: 0 };
                 trialBalanceMap.set(accId, {
                     acc_name: account.acc_name,
                     acc_pre_acc: account.acc_pre_acc,
@@ -74,7 +74,7 @@ const get_all_balance_sheet_data = async (filters = {}) => {
 
             if (!entry) {
                 // Create new entry if account not in trialBalanceMap
-                const allAccount = accountMap.get(accId) || { acc_name: 'Not found',acc_pre_acc:'NOF', acc_cash_balance: 0 };
+                const allAccount = accountMap.get(accId) || { acc_name: 'Not found', acc_pre_acc: 'NOF', acc_cash_balance: 0 };
                 entry = {
                     acc_name: allAccount.acc_name,
                     acc_pre_acc: allAccount.acc_pre_acc,
@@ -96,13 +96,14 @@ const get_all_balance_sheet_data = async (filters = {}) => {
         const liabilitiesObj = {};
 
         const liabilityGroups = [
-            "Current Liabilities", "Capital Account", "Duties & Taxes", "Loans (Liability)", "Provisions",
-            "Reserves & Surplus", "Sundry Creditors", "Unsecured Loans", "Secured Loans"
+            "Current Liabilities", "Capital Account", "Duties & Taxes", "Loans (Liability)",
+            "Provisions", "Reserves & Surplus", "Sundry Creditors", "Unsecured Loans", "Secured Loans"
         ];
+
         const assetGroups = [
             "Bank Od Account", "Current Assets", "Deposits (Asset)",
             "Fixed Assets", "Investments", "Loans & Advances (Asset)", "Stock-In-Hand",
-            "Sundry Debtors", "Cash In Hand","Bank Account","Online Account","Card Account"
+            "Sundry Debtors", "Cash In Hand", "Bank Account", "Online Account", "Card Account"
         ];
         // Convert Map to aggregated objects
         for (const [key, value] of trialBalanceMap.entries()) {
