@@ -129,11 +129,11 @@ const get_all_balance_sheet_data = async (filters = {}) => {
             if (assetGroups.indexOf(value.acc_pre_acc) !== -1) {
                 // Sum balances by acc_pre_acc
                 if (!assetsObj[value.acc_pre_acc]) assetsObj[value.acc_pre_acc] = 0;
-                assetsObj[value.acc_pre_acc] += value.acc_balance;
+                assetsObj[value.acc_pre_acc] += Math.abs(value.acc_balance);
 
             } else if (liabilityGroups.indexOf(value.acc_pre_acc) !== -1) {
                 if (!liabilitiesObj[value.acc_pre_acc]) liabilitiesObj[value.acc_pre_acc] = 0;
-                liabilitiesObj[value.acc_pre_acc] += value.acc_balance;
+                liabilitiesObj[value.acc_pre_acc] +=Math.abs( value.acc_balance);
             }
 
             delete value.total_cr_amt;
