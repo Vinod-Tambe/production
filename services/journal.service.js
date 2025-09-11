@@ -1,5 +1,5 @@
 const Journal = require('../models/journal.model');
-const { create_journal_trans_entry } = require('./journal_trans.service');
+const { create_journal_trans_entry, delete_journal_trans_entry } = require('./journal_trans.service');
 
 /*
  * Create a new journal entry.
@@ -24,6 +24,10 @@ const delete_journal_entry = async (jrnl_id, jrnl_own_id, jrnl_firm_id) => {
   try {
     const deleted = await Journal.findOneAndDelete({ jrnl_id, jrnl_own_id, jrnl_firm_id });
     if (!deleted) {
+      throw new Error('Journal entry not found');
+    }
+     const deleted_journal_trans = await delete_journal_trans_entry(jrnl_id, jrnl_own_id, jrnl_firm_id);
+      if (!deleted_journal_trans) {
       throw new Error('Journal entry not found');
     }
     return deleted;

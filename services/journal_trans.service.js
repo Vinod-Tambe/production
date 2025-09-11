@@ -18,9 +18,9 @@ async function create_journal_trans_entry(entries) {
 /**
  * Delete journal transaction entries by jrtr_jrnl_id.
  */
-async function delete_journal_trans_entry(jrtr_jrnl_id) {
+async function delete_journal_trans_entry(jrtr_jrnl_id,jrtr_own_id,jrtr_firm_id) {
     try {
-        const deleted = await JournalTrans.deleteMany({ jrtr_jrnl_id });
+        const deleted = await JournalTrans.deleteMany({ jrtr_jrnl_id, jrtr_own_id, jrtr_firm_id });
         return deleted;
     } catch (err) {
         throw new Error(`Failed to delete journal transactions: ${err.message}`);

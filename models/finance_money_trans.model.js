@@ -18,6 +18,10 @@ const financeMoneyTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+   fm_jrnl_id: {
+    type: Number,
+    default: 0,
+  },
   fm_add_date: {
     type: String,
      default: () => {

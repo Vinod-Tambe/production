@@ -1,5 +1,6 @@
 const Finance_Trans = require("../models/finance_trans.model");
 const { create_finance_money_entry } = require("./finance_money_trans.service");
+const { create_journal_entry } = require("./journal.service");
 
 const create_finance_transaction = async (
   data,
@@ -144,13 +145,49 @@ const update_finance_transaction = async (transData) => {
     }
 
     const updatedEMIs = await Finance_Trans.bulkWrite(updateOperations, { ordered: true });
-    const moneyEntry = updatedEMIs.modifiedCount > 0 ? await create_finance_money_entry(transData) : null;
-
+    //make a jornal entry
+    var jornal_request = {};
+    if (transData.fm_trans_type == "PAID") {
+      jornal_request = {
+        "journal_date": {
+          "jrnl_date": transData.fm_trans_date, "jrnl_firm_id": transData.fm_firm_id, "jrnl_own_id": transData.fm_own_id,
+          "jrnl_user_id": fm_user_id, "jrnl_amt": transData.fm_trans_amt, "jrnl_panel": "Finance", "jrnl_other_info": `${transData.fm_trans_type} EMI AMT | Fin No - ${transData.fm_fin_id}`
+        },
+        "joural_trans_data": [
+          { "jrtr_crdr": "CR", "jrtr_date": transData.fm_trans_date, "jrtr_cr_acc_id": transData.fm_cash_acc_id, "jrtr_cr_amt": transData.fm_cash_amt, "jrtr_acc_info": transData.fm_cash_info },
+          { "jrtr_crdr": "CR", "jrtr_date": transData.fm_trans_date, "jrtr_cr_acc_id": transData.fm_bank_acc_id, "jrtr_cr_amt": transData.fm_bank_amt, "jrtr_acc_info": transData.fm_bank_info },
+          { "jrtr_crdr": "CR", "jrtr_date": transData.fm_trans_date, "jrtr_cr_acc_id": transData.fm_online_acc_id, "jrtr_cr_amt": transData.fm_online_amt, "jrtr_acc_info": transData.fm_online_info },
+          { "jrtr_crdr": "CR", "jrtr_date": transData.fm_trans_date, "jrtr_cr_acc_id": transData.fm_card_acc_id, "jrtr_cr_amt": transData.fm_card_amt, "jrtr_acc_info": transData.fm_card_info },
+          { "jrtr_crdr": "DR", "jrtr_date": transData.fm_trans_date, "jrtr_dr_acc_id": transData.fm_dr_acc_id, "jrtr_dr_amt": transData.fm_trans_amt, "jrtr_acc_info": `${transData.fm_trans_type} EMI AMT | Fin No - ${transData.fm_fin_id}` }
+        ]
+      }
+    } else {
+      jornal_request = {
+        "journal_date": {
+          "jrnl_date": transData.fm_trans_date, "jrnl_firm_id": transData.fm_firm_id, "jrnl_own_id": transData.fm_own_id,
+          "jrnl_user_id": fm_user_id, "jrnl_amt": transData.fm_trans_amt, "jrnl_panel": "Finance", "jrnl_other_info": `${transData.fm_trans_type} EMI AMT | Fin No - ${transData.fm_fin_id}`
+        },
+        "joural_trans_data": [
+          { "jrtr_crdr": "DR", "jrtr_date": transData.fm_trans_date, "jrtr_dr_acc_id": transData.fm_cash_acc_id, "jrtr_dr_amt": transData.fm_cash_amt, "jrtr_acc_info": transData.fm_cash_info },
+          { "jrtr_crdr": "DR", "jrtr_date": transData.fm_trans_date, "jrtr_dr_acc_id": transData.fm_bank_acc_id, "jrtr_dr_amt": transData.fm_bank_amt, "jrtr_acc_info": transData.fm_bank_info },
+          { "jrtr_crdr": "DR", "jrtr_date": transData.fm_trans_date, "jrtr_dr_acc_id": transData.fm_online_acc_id, "jrtr_dr_amt": transData.fm_online_amt, "jrtr_acc_info": transData.fm_online_info },
+          { "jrtr_crdr": "DR", "jrtr_date": transData.fm_trans_date, "jrtr_dr_acc_id": transData.fm_card_acc_id, "jrtr_dr_amt": transData.fm_card_amt, "jrtr_acc_info": transData.fm_card_info },
+          { "jrtr_crdr": "CR", "jrtr_date": transData.fm_trans_date, "jrtr_cr_acc_id": transData.fm_dr_acc_id, "jrtr_cr_amt": transData.fm_trans_amt, "jrtr_acc_info": `${transData.fm_trans_type} EMI AMT | Fin No - ${transData.fm_fin_id}` }
+        ]
+      }
+    }
+    const jrnl_id = await create_journal_entry(jornal_request);
+    transData.fm_jrnl_id = jrnl_id;
+    if (jrnl_id) {
+      const moneyEntry = updatedEMIs.modifiedCount > 0 ? await create_finance_money_entry(transData) : null;
+    } else {
+      return { success: false, message: "Entry Issue Facing Line 167" };
+    }
+    //make a jornal entry
     return {
       success: true,
       message: 'EMI payment processed successfully.',
       updatedEmis: updatedEMIs.result,
-      moneyTransaction: moneyEntry
     };
   } catch (error) {
     console.error("Service Error (update_finance_transaction):", error.message);

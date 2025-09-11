@@ -1,7 +1,7 @@
 const Finance = require('../models/finance.modal');
 const { delete_finance_money_entries } = require('./finance_money_trans.service');
 const Finance_Transaction = require('./finance_transaction.service');
-const { create_journal_entry } = require('./journal.service');
+const { create_journal_entry, delete_journal_entry } = require('./journal.service');
 async function create_finance(data) {
   try {
     // Create and save the finance entry
@@ -61,6 +61,10 @@ async function delete_finance(id) {
   const result = await Finance.findOneAndDelete({ fin_id: id });
   await Finance_Transaction.delete_finance_transaction(id);
   await delete_finance_money_entries(id);
+  if(result)
+  {
+  await delete_journal_entry(result.fin_jrnl_id,result.fin_own_id,result.fin_firm_id);
+  }
   return result;
 }
 
