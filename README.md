@@ -1,10 +1,18 @@
+// Expenditure Accounts (goes to Profit & Loss - Debit side)
+const expenditure_accounts = [
+  { acc_name: "Direct Expenses", acc_pre_acc: "Direct Expenses" },
+  { acc_name: "Expenses (Direct)", acc_pre_acc: "Direct Expenses" },
+  { acc_name: "Expenses (Indirect)", acc_pre_acc: "Indirect Expenses" },
+  { acc_name: "Indirect Expenses", acc_pre_acc: "Indirect Expenses" },
+  { acc_name: "Purchase Accounts", acc_pre_acc: "Purchase Accounts" },
+  { acc_name: "Misc Expenses", acc_pre_acc: "Misc. Expenses (Asset)" } // Deferred Revenue Exp.
+];
 
-[16/09, 8:03 pm] आळशी AJJE: Eventloop
-How to increase big system performance
-How to retrieve data fast in query
-Bootstrap and something
-Internship project explain 
-Previous project explain
-Garbage collector
-While , do while ,for loop
-[16/09, 8:09 pm] आळशी AJJE: Synchronization and asynchronization
+// Revenue Accounts (goes to Profit & Loss - Credit side)
+const revenue_accounts = [
+  { acc_name: "Direct Incomes", acc_pre_acc: "Direct Incomes" },
+  { acc_name: "Income (Direct)", acc_pre_acc: "Direct Incomes" },
+  { acc_name: "Indirect Incomes", acc_pre_acc: "Indirect Incomes" }
+];
+
+module.exports = { expenditure_accounts, revenue_accounts };
