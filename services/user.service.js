@@ -35,7 +35,7 @@ const create_user = async (userData) => {
     user_last_name: trimmedLastName,
   });
   if (existingUser) {
-    throw new Error('User already exists — please change at least one: name, contact, or Aadhaar.');
+    throw new Error('User already exists — please change at least one: name,email, contact, or Aadhaar.');
   }
 
   // All validations passed, create user
@@ -82,7 +82,6 @@ const update_user = async (userId, updatedData) => {
       user_email: trimmedEmail,
       user_adhaar_no: trimmedAdhaar,
     });
-
     if (duplicateUser) {
       throw new Error('Another user already exists with the same name, contact, or Aadhaar.');
     }
