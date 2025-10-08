@@ -56,5 +56,8 @@ app.use("/trialbalance", trial_balanceRouters);
 const balance_sheetRouters = require("./routes/balance_sheet.route.js");
 app.use("/balancesheet", balance_sheetRouters);
 
+const girviRouters = require("./routes/girvi.route.js");
+app.use("/girvi", girviRouters);
+
 // ✅ Export only once at the end
 module.exports = app;

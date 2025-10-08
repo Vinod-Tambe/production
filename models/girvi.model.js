@@ -10,43 +10,53 @@ const girviSchema = new Schema(
       unique: true, // Auto-incremented by mongoose-sequence
     },
     girv_add_date: {
-      type: Date,
-      required: [true, 'Add date is required'],
-      default: Date.now,
+    type: String,
+       default: () => {
+      const now = new Date();
+      return now.toLocaleString("en-IN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+    },
     },
     girv_firm_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Firm',
+      type: Number,
       required: [true, 'Firm ID is required'],
+      min: [0, 'Firm ID cannot be negative'],
+      default: 0,
     },
     girv_own_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Owner',
+      type: Number,
       required: [true, 'Owner ID is required'],
+      min: [0, 'Owner ID cannot be negative'],
+      default: 0,
     },
     girv_user_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+      type: Number,
       required: [true, 'User ID is required'],
+      min: [0, 'User ID cannot be negative'],
+      default: 0,
     },
     girv_staff_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Staff',
+      type: Number,
       required: [true, 'Staff ID is required'],
+      min: [0, 'Staff ID cannot be negative'],
+      default: 0,
     },
     girv_start_date: {
-      type: Date,
-      required: [true, 'Start date is required'],
+      type: String,
+    required: true,
     },
     girv_loan_no: {
       type: String,
-      unique: true, // Ensure unique loan number (e.g., A1, A2, B1)
-      required: [true, 'Loan number is required'],
     },
     girv_loan_pre_no: {
       type: String,
-      unique: true, // Ensure unique pre-loan number (e.g., A1, A2, B1)
-      required: [true, 'Pre-loan number is required'],
     },
     girv_prin_amt: {
       type: Number,
@@ -116,14 +126,16 @@ const girviSchema = new Schema(
       default: 0,
     },
     girv_first_int_cr_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'First interest credit account ID is required'],
+      min: [0, 'First interest credit account ID cannot be negative'],
+      default: 0,
     },
     girv_first_int_dr_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'First interest debit account ID is required'],
+      min: [0, 'First interest debit account ID cannot be negative'],
+      default: 0,
     },
     girv_cash_amt: {
       type: Number,
@@ -150,24 +162,28 @@ const girviSchema = new Schema(
       default: 0,
     },
     girv_cash_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'Cash account ID is required'],
+      min: [0, 'Cash account ID cannot be negative'],
+      default: 0,
     },
     girv_bank_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'Bank account ID is required'],
+      min: [0, 'Bank account ID cannot be negative'],
+      default: 0,
     },
     girv_online_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'Online account ID is required'],
+      min: [0, 'Online account ID cannot be negative'],
+      default: 0,
     },
     girv_card_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'Card account ID is required'],
+      min: [0, 'Card account ID cannot be negative'],
+      default: 0,
     },
     girv_cash_info: {
       type: String,
@@ -190,9 +206,10 @@ const girviSchema = new Schema(
       default: '',
     },
     girv_dr_acc_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
+      type: Number,
       required: [true, 'Debit account ID is required'],
+      min: [0, 'Debit account ID cannot be negative'],
+      default: 0,
     },
     girv_other_info: {
       type: String,
@@ -213,51 +230,58 @@ const girviSchema = new Schema(
 // Apply mongoose-sequence for girv_id
 girviSchema.plugin(AutoIncrement, { inc_field: 'girv_id' });
 
-// Apply mongoose-sequence for girv_loan_no with prefix
-girviSchema.plugin(AutoIncrement, {
-  inc_field: 'girv_loan_no',
-  id: 'girv_loan_no_seq', // Unique counter ID for girv_loan_no
-  inc_type: String, // Output as string (e.g., A1, B1)
-  reference_fields: ['prefix_loan'], // Use a virtual prefix field
-});
-
-// Apply mongoose-sequence for girv_loan_pre_no with prefix
-girviSchema.plugin(AutoIncrement, {
-  inc_field: 'girv_loan_pre_no',
-  id: 'girv_loan_pre_no_seq', // Unique counter ID for girv_loan_pre_no
-  inc_type: String, // Output as string (e.g., A1, B1)
-  reference_fields: ['prefix_loan_pre'], // Use a virtual prefix field
-});
-
-// Virtual fields to store prefixes temporarily
-girviSchema.virtual('prefix_loan').get(function () {
-  return this._prefix_loan || 'A'; // Default to 'A' if not set
+// Virtual field to store the prefix
+girviSchema.virtual('prefix').get(function () {
+  return this._prefix || 'E'; // Default to 'A' if not set
 }).set(function (value) {
-  this._prefix_loan = value;
+  if (value && !/^[A-Z]$/.test(value)) {
+    throw new Error('Prefix must be a single uppercase letter');
+  }
+  this._prefix = "E";
 });
 
-girviSchema.virtual('prefix_loan_pre').get(function () {
-  return this._prefix_loan_pre || 'A'; // Default to 'A' if not set
-}).set(function (value) {
-  this._prefix_loan_pre = value;
-});
+// Counter model for custom string-based auto-increment
+const Counter = mongoose.model(
+  'Counter',
+  new Schema({
+    id: { type: String, required: true, unique: true }, // Changed from _id to id to match existing collection
+    seq: { type: Number, default: 0 },
+  })
+);
 
-// Pre-save middleware to format girv_loan_no and girv_loan_pre_no
+// Pre-save middleware to generate unique girv_loan_no and girv_loan_pre_no
 girviSchema.pre('save', async function (next) {
   if (this.isNew) {
-    // Ensure prefixes are set
-    const prefixLoan = this.prefix_loan || 'A';
-    const prefixLoanPre = this.prefix_loan_pre || 'A';
+    try {
+      const prefix = this.prefix || 'E';
+      // console.log('Generating loan numbers with prefix:', prefix);
 
-    // The sequence value is handled by mongoose-sequence
-    // Format will be set by the plugin (e.g., A1, B1)
-    this.girv_loan_no = `${prefixLoan}${this.girv_loan_no || ''}`;
-    this.girv_loan_pre_no = `${prefixLoanPre}${this.girv_loan_pre_no || ''}`;
+      // Generate sequence for the prefix
+      const counter = await Counter.findOneAndUpdate(
+        { id: `loan_sequence_${prefix}` },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+
+      // Set both girv_loan_no and girv_loan_pre_no to the same value
+      this.girv_loan_no = counter.seq;
+      this.girv_loan_pre_no = prefix;
+    } catch (error) {
+      // console.error('Error in pre-save middleware:', error);
+      return next(new Error(`Failed to generate loan numbers: ${error.message}`));
+    }
   }
   next();
 });
 
 // Create the Girvi model
 const Girvi = mongoose.model('Girvi', girviSchema);
+
+// Drop conflicting index if it exists
+mongoose.connection.collections['counters'].dropIndex('id_1_reference_value_1', { maxTimeMS: 30000 }, (err) => {
+  if (err && err.code !== 27) { // Ignore "index not found" error
+  } else {
+  }
+});
 
 module.exports = Girvi;
