@@ -66,35 +66,29 @@ const girviSchema = new Schema(
     },
     girv_process_per: {
       type: Number,
-      required: [true, 'Processing percentage is required'],
       min: [0, 'Processing percentage cannot be negative'],
       default: 0,
     },
     girv_process_amt: {
       type: Number,
-      required: [true, 'Processing amount is required'],
       min: [0, 'Processing amount cannot be negative'],
       default: 0,
     },
     girv_packet_no: {
       type: String,
-      required: [true, 'Packet number is required'],
       trim: true,
     },
     girv_locker_no: {
       type: String,
-      required: [true, 'Locker number is required'],
       trim: true,
     },
     girv_charge_per: {
       type: Number,
-      required: [true, 'Charge percentage is required'],
       min: [0, 'Charge percentage cannot be negative'],
       default: 0,
     },
     girv_charge_amt: {
       type: Number,
-      required: [true, 'Charge amount is required'],
       min: [0, 'Charge amount cannot be negative'],
       default: 0,
     },
@@ -108,7 +102,16 @@ const girviSchema = new Schema(
       type: String,
       required: [true, 'ROI type is required'],
       enum: {
-        values: ['fixed', 'floating', 'compound', 'simple'],
+        values: ['monthly', 'annually'],
+        message: '{VALUE} is not a valid ROI type',
+      },
+      trim: true,
+    },
+    girv_type: {
+      type: String,
+      required: [true, 'Loan type is required'],
+      enum: {
+        values: ['unsecured', 'secured'],
         message: '{VALUE} is not a valid ROI type',
       },
       trim: true,
@@ -120,10 +123,8 @@ const girviSchema = new Schema(
       default: 0,
     },
     girv_first_int: {
-      type: Number,
-      required: [true, 'First interest is required'],
-      min: [0, 'First interest cannot be negative'],
-      default: 0,
+      type: String,
+      default: "N",
     },
     girv_first_int_cr_acc_id: {
       type: Number,
@@ -139,25 +140,21 @@ const girviSchema = new Schema(
     },
     girv_cash_amt: {
       type: Number,
-      required: [true, 'Cash amount is required'],
       min: [0, 'Cash amount cannot be negative'],
       default: 0,
     },
     girv_bank_amt: {
       type: Number,
-      required: [true, 'Bank amount is required'],
       min: [0, 'Bank amount cannot be negative'],
       default: 0,
     },
     girv_online_amt: {
       type: Number,
-      required: [true, 'Online amount is required'],
       min: [0, 'Online amount cannot be negative'],
       default: 0,
     },
     girv_card_amt: {
       type: Number,
-      required: [true, 'Card amount is required'],
       min: [0, 'Card amount cannot be negative'],
       default: 0,
     },
