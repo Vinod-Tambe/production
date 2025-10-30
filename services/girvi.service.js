@@ -1,30 +1,30 @@
-const Girvi = require('../models/girvi.model'); 
+const Girvi = require('../models/girvi.model');
+const { create_stock } = require('./stock.service');
 
 // Add a new Girvi
-const create_girvi_record=async(girviData)=> {
+const create_girvi_record = async (girviData) => {
   try {
     const girvi = new Girvi(girviData);
     const savedGirvi = await girvi.save();
-    return await savedGirvi.populate([
-      'girv_firm_id',
-      'girv_own_id',
-      'girv_user_id',
-      'girv_staff_id',
-      'girv_first_int_cr_acc_id',
-      'girv_first_int_dr_acc_id',
-      'girv_cash_acc_id',
-      'girv_bank_acc_id',
-      'girv_online_acc_id',
-      'girv_card_acc_id',
-      'girv_dr_acc_id'
-    ]);
+    if(girviData.girv_type==='secured')
+    {
+    const stock_data = await create_stock(girviData.stock_details);
+    savedGirvi.stock_data = stock_data;
+    return {
+      girvi_details: savedGirvi,
+      stock_details: stock_data
+    };
+  }else{
+    return savedGirvi;
+  }
   } catch (error) {
     throw new Error(`Failed to add Girvi: ${error.message}`);
   }
-}
+};
+
 
 // Update an existing Girvi by ID
-const update_girvi_record=async(id, updateData)=> {
+const update_girvi_record = async (id, updateData) => {
   try {
     const girvi = await Girvi.findByIdAndUpdate(
       id,
@@ -53,7 +53,7 @@ const update_girvi_record=async(id, updateData)=> {
 }
 
 // Remove a Girvi by ID
-const remove_girvi_record=async(id)=> {
+const remove_girvi_record = async (id) => {
   try {
     const girvi = await Girvi.findByIdAndDelete(id);
     if (!girvi) {
@@ -66,7 +66,7 @@ const remove_girvi_record=async(id)=> {
 }
 
 // Get a Girvi by ID
-const get_girvi_record_details= async(id)=> {
+const get_girvi_record_details = async (id) => {
   try {
     const girvi = await Girvi.findById(id).populate([
       'girv_firm_id',
@@ -91,7 +91,7 @@ const get_girvi_record_details= async(id)=> {
 }
 
 // List all Girvi records
-const get_all_girvi_record=async()=> {
+const get_all_girvi_record = async () => {
   try {
     return await Girvi.find().populate([
       'girv_firm_id',
