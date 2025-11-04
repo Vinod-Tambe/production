@@ -244,7 +244,7 @@ const get_interest_difference = (principal, inputDateStr, int_rate, rateType) =>
   // Return final object
   return {
     startDate: formatDate(inputDate),
-    endDate: formatDate(new Date()),
+    endDate: formatDate(new Date(Date.now() - 24 * 60 * 60 * 1000)),
     years,
     months,
     days,
