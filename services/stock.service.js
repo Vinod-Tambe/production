@@ -80,35 +80,21 @@ const get_stock_details = async (st_id) => {
     }
 };
 
-const get_all_stock = async (filters = {}, pagination = { page: 1, limit: 10 }) => {
-    try {
-        const { page = 1, limit = 10 } = pagination;
-        const skip = (page - 1) * limit;
-
-        // Build query
-        const query = { ...filters };
-        if (filters.st_status) {
-            query.st_status = filters.st_status;
+const get_all_stock = async (filters = {}) => {
+       try {
+        const stock = await Stock.find(filters).select(`
+        -_id
+        -st_add_date
+        -createdAt
+        -updatedAt
+        -__v
+        `).lean();
+        if (!stock) {
+            throw new Error('Stock not found');
         }
-
-        const [stocks, total] = await Promise.all([
-            Stock.find(query)
-                .sort({ st_add_date: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            Stock.countDocuments(query)
-        ]);
-
-        return {
-            stocks,
-            total,
-            page: parseInt(page),
-            limit: parseInt(limit),
-            totalPages: Math.ceil(total / limit)
-        };
+        return stock;
     } catch (error) {
-        throw new Error(`Failed to fetch stocks: ${error.message}`);
+        throw new Error(`Failed to fetch stock details: ${error.message}`);
     }
 };
 

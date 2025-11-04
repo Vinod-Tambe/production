@@ -3,7 +3,6 @@ const Joi = require('joi');
 
 const FIELD_LABELS = {
   girv_firm_id: 'Firm ID',
-  girv_own_id: 'Owner ID',
   girv_user_id: 'User ID',
   girv_staff_id: 'Staff ID',
   girv_start_date: 'Loan Start Date',
@@ -70,7 +69,6 @@ const optionalStr = (key) =>
  * Stock Details Schema (for secured loans)
  */
 const stockDetailSchema = Joi.object({
-  st_own_id: idField('st_own_id').required().messages({ 'any.required': MSG.required }),
   st_firm_id: idField('st_firm_id').required().messages({ 'any.required': MSG.required }),
   st_user_id: idField('st_user_id').required().messages({ 'any.required': MSG.required }),
   st_staff_id: idField('st_staff_id').required().messages({ 'any.required': MSG.required }),
@@ -135,7 +133,6 @@ const stockDetailSchema = Joi.object({
  */
 const baseGirviSchema = {
   girv_firm_id: idField('girv_firm_id').required().messages({ 'any.required': MSG.required }),
-  girv_own_id: idField('girv_own_id').required().messages({ 'any.required': MSG.required }),
   girv_user_id: idField('girv_user_id').required().messages({ 'any.required': MSG.required }),
   girv_staff_id: idField('girv_staff_id').required().messages({ 'any.required': MSG.required }),
 

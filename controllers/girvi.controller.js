@@ -1,8 +1,11 @@
 const { create_girvi_record, update_girvi_record, get_girvi_record_details, get_all_girvi_record } = require("../services/girvi.service");
+const { getOwnerIdFromToken } = require("../utils/tokenHelper");
 
 // Controller to create a new Girvi
 const create_girvi = async (req, res) => {
   try {
+     const ownerId = await getOwnerIdFromToken(req);
+     req.body.girv_own_id=ownerId;
     const girvi = await create_girvi_record(req.body);
     res.status(201).json({
       success: true,
@@ -53,7 +56,7 @@ const delete_girvi = async (req, res) => {
 // Controller to get a Girvi by ID
 const get_girvi_details = async (req, res) => {
   try {
-    const girvi = await get_girvi_record_details(req.params.id);
+    const girvi = await get_girvi_record_details(req.params.girv_id);
     res.status(200).json({
       success: true,
       data: girvi
