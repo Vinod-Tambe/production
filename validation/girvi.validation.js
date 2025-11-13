@@ -96,11 +96,11 @@ const stockDetailSchema = Joi.object({
   }),
 
   st_gs_type: labeled(
-    Joi.string().valid('gram', 'kg', 'tola').required(),
+    Joi.string().valid('GM', 'KG').required(),
     'st_gs_type'
   ).messages({
     'any.required': 'Gross Weight Unit is required.',
-    'any.only': 'Gross Weight Unit must be "gram", "kg", or "tola".',
+    'any.only': 'Gross Weight Unit must be "GM", "KG".',
   }),
 
   st_nt_weight: labeled(Joi.number().min(0).required(), 'st_nt_weight').messages({
@@ -109,11 +109,11 @@ const stockDetailSchema = Joi.object({
   }),
 
   st_nt_type: labeled(
-    Joi.string().valid('gram', 'kg', 'tola').required(),
+    Joi.string().valid('GM', 'KG').required(),
     'st_nt_type'
   ).messages({
     'any.required': 'Net Weight Unit is required.',
-    'any.only': 'Net Weight Unit must be "gram", "kg", or "tola".',
+    'any.only': 'Net Weight Unit must be "GM", "KG".',
   }),
 
   st_purity: labeled(Joi.number().min(0).max(100).required(), 'st_purity').messages({

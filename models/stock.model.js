@@ -39,9 +39,9 @@ const stockSchema = new Schema(
             min: 0
         },
         st_gs_weight: { type: Number, required: true, min: 0 },
-        st_gs_type: { type: String, enum: ['gram', 'tola', 'kg'], required: true },
+        st_gs_type: { type: String, enum: ['GM', 'KG'], required: true },
         st_nt_weight: { type: Number, required: true, min: 0 },
-        st_nt_type: { type: String, enum: ['gram', 'tola', 'kg'], required: true },
+        st_nt_type: { type: String, enum: ['GM', 'KG'], required: true },
         st_purity: { type: Number, required: true, min: 0, max: 100 },
         st_fine_weight: { type: Number, required: true, min: 0 },
         st_valuation: { type: Number, required: true, min: 0 },
