@@ -33,3 +33,14 @@ girv_card_info
 girv_dr_acc_id
 girv_other_info
 girv_pay_info
+
+
+
+
+Host: 64.0.100.3
+
+Username: Unicorn_Team
+
+Passwrd: Unicorn_PASS
+
+DB: unicorn_db
